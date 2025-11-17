@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script> -->
+    <title>GSAP Test</title>
+
+    <style>
+      #app {
+        width: 600px;
+        height: fit-content;
+        margin-top: 15px;
+        padding: 10px;
+        display: flex;
+        align-items: center;
+        border-radius: 5px;
+        border: 1px solid #c4c4c4;
+        position: relative;
+      }
+
+      .container {
+        padding: 15px;
+      }
+
+      .ball {
+        width: 50px;
+        height: 50px;
+        background-color: #f50057;
+        border-radius: 7px;
+        margin-left: 10px;
+        margin-top: 7px;
+        /* position: absolute; */
+        /* box-shadow: 5px -4px 17px 0px #2927278c; */
+      }
+
+      .red {
+        background-color: red;
+      }
+
+      .green {
+        background-color: green;
+        left: 80px;
+      }
+
+      .yellow {
+        background-color: rgb(236, 236, 62);
+      }
+
+      .btn {
+        padding: 10px;
+        padding-left: 15px;
+        padding-right: 15px;
+        background-color: rgb(25, 92, 179);
+        color: white;
+        border: none;
+        outline: none;
+        border-radius: 7px;
+        cursor: pointer;
+      }
+
+      .con {
+        width: 100%;
+        height: 100%;
+        /* display: flex;
+        align-items: center; */
+      }
+
+      .btn-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+    </style>
+
+    <script src="./index.js" type="module" defer></script>
+  </head>
+  <body>
+    <div class="btn-wrapper">
+      <!-- <button class="btn" id="btn-start">Start</button> -->
+      <button class="btn" id="btn-play">Play</button>
+      <button class="btn" id="btn-reverse">Reverse</button>
+      <button class="btn" id="btn-pause">Pause</button>
+      <button class="btn" id="btn-resume">Resume</button>
+    </div>
+
+    <div id="app">
+      <div class="con">
+        <div class="ball green" id="opacity-ball"></div>
+        <div class="ball yellow" id="opacity-ball"></div>
+        <div class="ball red" id="opacity-ball"></div>
+      </div>
+    </div>
+  </body>
+</html>
