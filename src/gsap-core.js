@@ -633,8 +633,10 @@ let _config = {
       vars = params[varsIndex],
       irVars,
       parent;
+
     isLegacy && (vars.duration = params[1]);
     vars.parent = timeline;
+
     if (type) {
       irVars = vars;
       parent = timeline;
@@ -648,6 +650,7 @@ let _config = {
         ? (vars.runBackwards = 1)
         : (vars.startAt = params[varsIndex - 1]); // "from" vars
     }
+
     return new Tween(params[0], vars, params[varsIndex + 1]);
   },
   _conditionalReturn = (value, func) =>
@@ -3385,14 +3388,18 @@ export class Tween extends Animation {
       curTarget,
       staggerFunc,
       staggerVarsToMerge;
+
     this._targets = parsedTargets.length
       ? _harness(parsedTargets)
       : _warn(
           "GSAP target " + targets + " not found. https://gsap.com",
           !_config.nullTargetWarn
         ) || [];
+
     this._ptLookup = []; //PropTween lookup. An array containing an object for each target, having keys for each tweening property
+
     this._overwrite = overwrite;
+
     if (
       keyframes ||
       stagger ||
@@ -3844,6 +3851,7 @@ export class Tween extends Animation {
   }
 
   static to(targets, vars) {
+    console.log("arguments[2] ", arguments[2]);
     return new Tween(targets, vars, arguments[2]);
   }
 
@@ -4059,6 +4067,7 @@ _forEachName(
     "parent,duration,ease,delay,overwrite,runBackwards,startAt,yoyo,immediateRender,repeat,repeatDelay,data,paused,reversed,lazy,callbackScope,stringFilter,id,yoyoEase,stagger,inherit,repeatRefresh,keyframes,autoRevert,scrollTrigger",
   (name) => (_reservedProps[name] = 1)
 );
+
 _globals.TweenMax = _globals.TweenLite = Tween;
 _globals.TimelineLite = _globals.TimelineMax = Timeline;
 _globalTimeline = new Timeline({
