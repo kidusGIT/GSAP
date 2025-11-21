@@ -21,6 +21,7 @@ pause.onclick = () => {
 };
 
 reverse.onclick = () => {
+  console.log("-----------------------------------");
   t.reverse();
 };
 
