@@ -1320,6 +1320,7 @@ let _config = {
    * --------------------------------------------------------------------------------------
    */
   _tickerActive,
+  startTime = null,
   _ticker = (function () {
     let _getTime = Date.now,
       _lagThreshold = 500,
@@ -1343,6 +1344,10 @@ let _config = {
           time,
           frame;
 
+        if (startTime === null) {
+          startTime = v;
+        }
+
         (elapsed > _lagThreshold || elapsed < 0) &&
           (_startTime += elapsed - _adjustedLag);
 
@@ -1358,21 +1363,26 @@ let _config = {
           dispatch = 1;
         }
 
-        console.log(
-          "_lastUpdate ",
-          _lastUpdate,
-          ", time ",
-          time,
-          " , _nextTime ",
-          _nextTime,
-          " , elapsed ",
-          elapsed
-        );
+        // console.log(
+        //   "_lastUpdate ",
+        //   _lastUpdate,
+        //   ", time ",
+        //   time,
+        //   " , _nextTime ",
+        //   _nextTime,
+        //   " , elapsed ",
+        //   elapsed
+        // );
+
+        // const elapsedTime = v - startTime;
+
+        console.log("elapsedTime ", _startTime, " vs ", _lastUpdate);
 
         manual || (_id = _req(_tick)); //make sure the request is made before we dispatch the "tick" event so that timing is maintained. Otherwise, if processing the "tick" requires a bunch of time (like 15ms) and we're using a setTimeout() that's based on 16.7ms, it'd technically take 31.7ms between frames otherwise.
         if (dispatch) {
           for (_i = 0; _i < _listeners.length; _i++) {
             // use _i and check _listeners.length instead of a variable because a listener could get removed during the loop, and if that happens to an element less than the current index, it'd throw things off in the loop.
+            // console.log("_listeners[_i] ", _listeners[_i]);
             _listeners[_i](time, _delta, frame, v);
           }
         }
@@ -3867,7 +3877,6 @@ export class Tween extends Animation {
   }
 
   static to(targets, vars) {
-    console.log("arguments[2] ", arguments[2]);
     return new Tween(targets, vars, arguments[2]);
   }
 
