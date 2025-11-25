@@ -1382,7 +1382,6 @@ let _config = {
         if (dispatch) {
           for (_i = 0; _i < _listeners.length; _i++) {
             // use _i and check _listeners.length instead of a variable because a listener could get removed during the loop, and if that happens to an element less than the current index, it'd throw things off in the loop.
-            // console.log("_listeners[_i] ", _listeners[_i]);
             _listeners[_i](time, _delta, frame, v);
           }
         }

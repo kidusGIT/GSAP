@@ -11,10 +11,7 @@ const resume = document.getElementById("btn-resume");
 //   .to(".yellow", { duration: 2, x: 535 }, ">-2")
 //   .to(".red", { duration: 1, x: 535 }, "<-1");
 
-const t = gsap.to(".green", { duration: 5, x: 535 });
-
-// const t = tween
-// (".yellow", "left", { duration: 1000, to: 420 });
+const t = gsap.to(".green", { duration: 1, x: 535 });
 
 pause.onclick = () => {
   t.pause();
