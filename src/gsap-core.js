@@ -1376,7 +1376,12 @@ let _config = {
 
         // const elapsedTime = v - startTime;
 
-        console.log("elapsedTime ", _startTime, " vs ", _lastUpdate);
+        if (startTime === null) {
+          console.log("first");
+          startTime = _getTime();
+        } else {
+          console.log("not first");
+        }
 
         manual || (_id = _req(_tick)); //make sure the request is made before we dispatch the "tick" event so that timing is maintained. Otherwise, if processing the "tick" requires a bunch of time (like 15ms) and we're using a setTimeout() that's based on 16.7ms, it'd technically take 31.7ms between frames otherwise.
         if (dispatch) {
@@ -3730,6 +3735,7 @@ export class Tween extends Animation {
           (tTime || prevTime || isYoyo)
         ) {
           // if prevTime and tTime are zero, we shouldn't fire the onReverseComplete. This could happen if you gsap.to(... {paused:true}).play();
+          console.log("end.....");
           _callback(
             this,
             tTime === tDur ? "onComplete" : "onReverseComplete",
