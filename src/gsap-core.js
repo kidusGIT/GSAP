@@ -1344,10 +1344,6 @@ let _config = {
           time,
           frame;
 
-        if (startTime === null) {
-          startTime = v;
-        }
-
         (elapsed > _lagThreshold || elapsed < 0) &&
           (_startTime += elapsed - _adjustedLag);
 
@@ -1362,19 +1358,6 @@ let _config = {
           _nextTime += overlap + (overlap >= _gap ? 4 : _gap - overlap);
           dispatch = 1;
         }
-
-        // console.log(
-        //   "_lastUpdate ",
-        //   _lastUpdate,
-        //   ", time ",
-        //   time,
-        //   " , _nextTime ",
-        //   _nextTime,
-        //   " , elapsed ",
-        //   elapsed
-        // );
-
-        // const elapsedTime = v - startTime;
 
         if (startTime === null) {
           console.log("first");
@@ -2830,7 +2813,8 @@ export class Timeline extends Animation {
       _lastRenderedFrame = _ticker.frame;
     }
     if (_ticker.frame >= _nextGCFrame) {
-      _nextGCFrame += _config.autoSleep || 120;
+      // _nextGCFrame += _config.autoSleep || 120;
+      _nextGCFrame += 60;
       let child = _globalTimeline._first;
       if (!child || !child._ts)
         if (_config.autoSleep && _ticker._listeners.length < 2) {
