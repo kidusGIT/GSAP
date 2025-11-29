@@ -1378,6 +1378,7 @@ let _config = {
     _self = {
       time: 0,
       frame: 0,
+      id: _id,
       tick() {
         _tick(true);
       },
@@ -1414,6 +1415,7 @@ let _config = {
         (_raf ? cancelAnimationFrame : clearTimeout)(_id);
         _tickerActive = 0;
         _req = _emptyFunc;
+        console.log("_id ", _id);
       },
       lagSmoothing(threshold, adjustedLag) {
         _lagThreshold = threshold || Infinity; // zero should be interpreted as basically unlimited
@@ -2821,6 +2823,7 @@ export class Timeline extends Animation {
           while (child && !child._ts) {
             child = child._next;
           }
+
           child || _ticker.sleep();
         }
     }
