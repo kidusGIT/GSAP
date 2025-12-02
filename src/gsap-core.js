@@ -1453,6 +1453,7 @@ let _config = {
    * EASING
    * -------------------------------------------------
    */
+
   _easeMap = {},
   _customEaseExp = /^[\d.\-M][\d.\-,\s]/,
   _quotesExp = /["']/g,
@@ -2218,6 +2219,7 @@ export class Timeline extends Animation {
   }
 
   render(totalTime, suppressEvents, force) {
+    // console.log("totalTime ", totalTime, "this._time ", this._tTime);
     let prevTime = this._time,
       tDur = this._dirty ? this.totalDuration() : this._tDur,
       dur = this._dur,
@@ -2358,6 +2360,7 @@ export class Timeline extends Animation {
         prevTime = 0; // upon init, the playhead should always go forward; someone could invalidate() a completed timeline and then if they restart(), that would make child tweens render in reverse order which could lock in the wrong starting values if they build on each other, like tl.to(obj, {x: 100}).to(obj, {x: 0}).
       }
       if (!prevTime && tTime && !suppressEvents && !prevIteration) {
+        console.log("start");
         _callback(this, "onStart");
         if (this._tTime !== tTime) {
           // in case the onStart triggered a render at a different spot, eject. Like if someone did animation.pause(0.5) or something inside the onStart.
@@ -2377,6 +2380,7 @@ export class Timeline extends Animation {
               // an extreme edge case - the child's render could do something like kill() the "next" one in the linked list, or reparent it. In that case we must re-initiate the whole render to be safe.
               return this.render(totalTime, suppressEvents, force);
             }
+
             child.render(
               child._ts > 0
                 ? (time - child._start) * child._ts
@@ -2457,6 +2461,7 @@ export class Timeline extends Animation {
               !(totalTime < 0 && !prevTime) &&
               (tTime || prevTime || !tDur)
             ) {
+              console.log("Timeline end.....");
               _callback(
                 this,
                 tTime === tDur && totalTime >= 0
@@ -3542,6 +3547,7 @@ export class Tween extends Animation {
   }
 
   render(totalTime, suppressEvents, force) {
+    // console.log("Tween: totalTime ", totalTime, "this._time ", this._tTime);
     let prevTime = this._time,
       tDur = this._tDur,
       dur = this._dur,
@@ -3675,12 +3681,14 @@ export class Tween extends Animation {
       }
 
       if (!prevTime && tTime && !suppressEvents && !prevIteration) {
+        console.log("Start tween: ", prevTime, " - ", time);
         _callback(this, "onStart");
         if (this._tTime !== tTime) {
           // in case the onStart triggered a render at a different spot, eject. Like if someone did animation.pause(0.5) or something inside the onStart.
           return this;
         }
       }
+
       pt = this._pt;
       while (pt) {
         pt.r(ratio, pt.d);
@@ -3722,7 +3730,7 @@ export class Tween extends Animation {
           (tTime || prevTime || isYoyo)
         ) {
           // if prevTime and tTime are zero, we shouldn't fire the onReverseComplete. This could happen if you gsap.to(... {paused:true}).play();
-          console.log("end.....");
+          console.log("Tween end.....");
           _callback(
             this,
             tTime === tDur ? "onComplete" : "onReverseComplete",
