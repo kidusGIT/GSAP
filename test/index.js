@@ -6,19 +6,22 @@ const reverse = document.getElementById("btn-reverse");
 const play = document.getElementById("btn-play");
 const resume = document.getElementById("btn-resume");
 
-// const t = gsap.timeline();
-// t.to(".green", { duration: 1, x: 535 })
-//   .to(".yellow", { duration: 2, x: 535 }, ">-2")
-//   .to(".red", { duration: 1, x: 535 }, "<-1");
-
 const t = gsap.timeline();
 t.to(".green", { duration: 1, x: 535 })
-  .to(".yellow", { duration: 2, x: 535 })
-  .to(".red", { duration: 1, x: 535 });
+  .to(".yellow", { duration: 2, x: 535 }, ">1")
+  .to(".red", { duration: 1, x: 535 }, "<-1");
+
+// const t = gsap.timeline();
+// t.to(".green", { duration: 1, x: 535 })
+//   .to(".yellow", { duration: 2, x: 535 })
+//   .to(".red", { duration: 1, x: 535 });
 
 // const t = gsap.to(".green", { duration: 1.5, x: 535 });
 
+pause.style.transform = "250px";
+
 pause.onclick = () => {
+  console.log("paused clicked");
   t.pause();
 };
 
