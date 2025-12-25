@@ -1,53 +1,20 @@
 import { gsap } from "../../src/index.js";
+import { ScrollTrigger } from "../../src/ScrollTrigger.js";
+gsap.registerPlugin(ScrollTrigger);
 
-const start = document.getElementById("btn-start");
-const pause = document.getElementById("btn-pause");
-const reverse = document.getElementById("btn-reverse");
-const play = document.getElementById("btn-play");
-const resume = document.getElementById("btn-resume");
+const t = gsap.timeline({
+  scrollTrigger: {
+    trigger: ".card",
+    start: "-100px center",
+    end: "300px center",
+    scrub: true,
+    markers: true,
+    // toggleActions: 'onEnter onLeave onEnterBack onLeaveBack' // make scrub false
+  },
+});
 
-const t = gsap.timeline();
-t.to(".green", { duration: 1, x: 535 })
-  .to(".yellow", { duration: 2, x: 535 }, ">-2")
-  .to(".red", { duration: 1, x: 535 }, "<-1");
+// onEnter onLeave onEnterBack onLeaveBack can be [ play, pause, reverse, resume, restart, reset, complete, none ]
 
-// const t = gsap.timeline();
-// t.to(".green", { duration: 1, x: 535 })
-//   .to(".yellow", { duration: 2, x: 535 })
-//   .to(".red", { duration: 1, x: 535 });
-
-// const t = gsap.timeline();
-// t.to(".green", { duration: 1, x: 535 })
-//   .to(".yellow", { duration: 2, x: 535 })
-//   .to(".red", { duration: 1, x: 535 });
-
-// const t = gsap.to(".green", {
-//   duration: 1.5,
-//   x: 535,
-//   // rotation: 360,
-//   // repeat: -1,
-// });
-
-pause.style.transform = "250px";
-
-pause.onclick = () => {
-  console.log("paused clicked");
-  t.pause();
-};
-
-reverse.onclick = () => {
-  console.log("-----------------------------------");
-  t.reverse();
-};
-
-play.onclick = () => {
-  t.play();
-};
-
-resume.onclick = () => {
-  t.resume();
-};
-
-// start.onclick = () => {
-//   // t.animate(".yellow", "left", { duration: 1000, to: 420 });
-// };
+t.to(".card", {
+  x: 1100,
+});
