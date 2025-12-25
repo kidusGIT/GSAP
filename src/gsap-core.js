@@ -2109,8 +2109,6 @@ _setDefaults(Animation.prototype, {
 export class Timeline extends Animation {
   constructor(vars = {}, position) {
     super(vars);
-    console.log("enter root ", vars.id);
-
     this.labels = {};
     this.smoothChildTiming = !!vars.smoothChildTiming;
     this.autoRemoveChildren = !!vars.autoRemoveChildren;
@@ -2221,7 +2219,6 @@ export class Timeline extends Animation {
   }
 
   render(totalTime, suppressEvents, force) {
-    // console.log("totalTime ", totalTime, "this._time ", this._tTime);
     let prevTime = this._time,
       tDur = this._dirty ? this.totalDuration() : this._tDur,
       dur = this._dur,
@@ -2351,6 +2348,7 @@ export class Timeline extends Animation {
         }
       }
 
+      // console.log("time ", time, " tTime", tTime, "this._time ", this._tTime);
       this._tTime = tTime;
       this._time = time;
       this._act = !timeScale; //as long as it's not paused, force it to be active so that if the user renders independent of the parent timeline, it'll be forced to re-render on the next tick.
@@ -3549,7 +3547,6 @@ export class Tween extends Animation {
   }
 
   render(totalTime, suppressEvents, force) {
-    // console.log("Tween: totalTime ", totalTime, "this._time ", this._tTime);
     let prevTime = this._time,
       tDur = this._tDur,
       dur = this._dur,
@@ -3678,6 +3675,8 @@ export class Tween extends Animation {
       }
 
       this.ratio = ratio = (yoyoEase || this._ease)(time / dur);
+      console.log("time ", time, " ratio: ", ratio, " start: ", this._start);
+
       if (this._from) {
         this.ratio = ratio = 1 - ratio;
       }
