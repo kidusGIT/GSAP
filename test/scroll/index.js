@@ -8,18 +8,13 @@ const resume = document.getElementById("btn-resume");
 
 const t = gsap.timeline();
 t.to(".green", { duration: 1, x: 535 })
-<<<<<<< HEAD:test/scroll/index.js
   .to(".yellow", { duration: 2, x: 535 }, ">-2")
-  .to(".red", { duration: 1, x: 535 }, "<-1");
-=======
-  .to(".yellow", { duration: 2, x: 535 }, ">1")
   .to(".red", { duration: 1, x: 535 }, "<-1");
 
 // const t = gsap.timeline();
 // t.to(".green", { duration: 1, x: 535 })
 //   .to(".yellow", { duration: 2, x: 535 })
 //   .to(".red", { duration: 1, x: 535 });
->>>>>>> 6a9d5402b6ff86e93e0c6390d39ffae762b63412:test/index.js
 
 // const t = gsap.timeline();
 // t.to(".green", { duration: 1, x: 535 })
