@@ -1416,7 +1416,7 @@ let _config = {
         _tickerActive = 0;
         _req = _emptyFunc;
         startTime = null;
-        // console.log("_id ", _id);
+        console.log("_id ", _id);
       },
       lagSmoothing(threshold, adjustedLag) {
         _lagThreshold = threshold || Infinity; // zero should be interpreted as basically unlimited
@@ -1792,6 +1792,7 @@ export class Animation {
   }
 
   totalProgress(value, suppressEvents) {
+    // console.log("scrolles ", value);
     return arguments.length
       ? this.totalTime(this.totalDuration() * value, suppressEvents)
       : this.totalDuration()
@@ -3675,7 +3676,7 @@ export class Tween extends Animation {
       }
 
       this.ratio = ratio = (yoyoEase || this._ease)(time / dur);
-
+      // console.log("ratio ", ratio);
       if (this._from) {
         this.ratio = ratio = 1 - ratio;
       }
@@ -3730,7 +3731,7 @@ export class Tween extends Animation {
           (tTime || prevTime || isYoyo)
         ) {
           // if prevTime and tTime are zero, we shouldn't fire the onReverseComplete. This could happen if you gsap.to(... {paused:true}).play();
-          // console.log("Tween end.....");
+          console.log("Tween end.....");
           _callback(
             this,
             tTime === tDur ? "onComplete" : "onReverseComplete",

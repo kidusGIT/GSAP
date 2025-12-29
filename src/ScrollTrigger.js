@@ -381,7 +381,6 @@ let gsap,
         _rafID || (_rafID = requestAnimationFrame(_updateAll));
       } else {
         _updateAll(); // Safari in particular (on desktop) NEEDS the immediate update rather than waiting for a requestAnimationFrame() whereas iOS seems to benefit from waiting for the requestAnimationFrame() tick, at least when normalizing. See https://codepen.io/GreenSock/pen/qBYozqO?editors=0110
-        console.log("scroll");
       }
       _lastScrollTime || _dispatch("scrollStart");
       _lastScrollTime = _getTime();
@@ -1877,9 +1876,8 @@ export class ScrollTrigger {
           snap1 = animation && !isToggle ? animation.totalProgress() : clipped;
         }
       }
-
-      console.log("progress: ", prevProgress);
-
+      console.log("p ", scroll);
+      // console.log("progress: ", prevProgress);
       // anticipate the pinning a few ticks ahead of time based on velocity to avoid a visual glitch due to the fact that most browsers do scrolling on a separate thread (not synced with requestAnimationFrame).
       if (
         anticipatePin &&
@@ -1944,6 +1942,7 @@ export class ScrollTrigger {
                 .getTrailing(preventOverlaps)
                 .forEach((t) => t.endAnimation()));
 
+        // For scrub
         if (!isToggle) {
           if (scrubTween && !_refreshing && !_startup) {
             scrubTween._dp._time - scrubTween._start !== scrubTween._time &&
@@ -1960,12 +1959,15 @@ export class ScrollTrigger {
               scrubTween.invalidate().restart();
             }
           } else if (animation) {
+            // console.log("scroll toggle ", animation._targets[0]);
             animation.totalProgress(
               clipped,
               !!(_refreshing && (lastRefresh || reset))
             );
           }
         }
+
+        // For pin
         if (pin) {
           reset &&
             pinSpacing &&
@@ -1997,6 +1999,7 @@ export class ScrollTrigger {
               pinSetter(pinStart + (clipped === 1 && !isAtMax ? pinChange : 0));
           }
         }
+
         snap &&
           !tweenTo.tween &&
           !_refreshing &&
@@ -2009,7 +2012,9 @@ export class ScrollTrigger {
               toggleClass.className
             )
           ); // classes could affect positioning, so do it even if reset or refreshing is true.
+
         onUpdate && !isToggle && !reset && onUpdate(self);
+
         if (stateChanged && !_refreshing) {
           if (isToggle) {
             if (isTakingAction) {
@@ -2025,6 +2030,7 @@ export class ScrollTrigger {
             }
             onUpdate && onUpdate(self);
           }
+
           if (toggled || !_limitCallbacks) {
             // on startup, the page could be scrolled and we don't want to fire callbacks that didn't toggle. For example onEnter shouldn't fire if the ScrollTrigger isn't actually entered.
             onToggle && toggled && _callback(self, onToggle);

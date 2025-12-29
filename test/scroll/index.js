@@ -25,8 +25,8 @@ gsap.to(".violet", {
   x: 1100,
   scrollTrigger: {
     trigger: ".violet", // for multiple targets
-    start: "-50px 20%",
-    end: "300px 50%",
+    start: "-50px center",
+    end: "300px center",
     scrub: true,
     markers: true,
   },
@@ -38,8 +38,8 @@ gsap.to(".blue", {
     trigger: ".blue", // for multiple targets
     // start: "-50px 70%",
     // end: "300px 90%",
-    start: "-50px 20%",
-    end: "300px 50%",
+    start: "-50px center",
+    end: "300px center",
     scrub: true,
     markers: true,
   },
