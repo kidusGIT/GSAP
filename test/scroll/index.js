@@ -21,25 +21,25 @@ gsap.registerPlugin(ScrollTrigger);
 
 // onEnter onLeave onEnterBack onLeaveBack can be [ play, pause, reverse, resume, restart, reset, complete, none ]
 
-gsap.to(".violet", {
-  x: 1100,
-  scrollTrigger: {
-    trigger: ".violet", // for multiple targets
-    start: "-50px center",
-    end: "300px center",
-    scrub: true,
-    markers: true,
-  },
-});
+// gsap.to(".violet", {
+//   x: 1100,
+//   scrollTrigger: {
+//     trigger: ".violet", // for multiple targets
+//     start: "-50px center",
+//     end: "300px center",
+//     scrub: true,
+//     markers: true,
+//   },
+// });
 
 gsap.to(".blue", {
   x: 900,
   scrollTrigger: {
     trigger: ".blue", // for multiple targets
-    // start: "-50px 70%",
-    // end: "300px 90%",
-    start: "-50px center",
-    end: "300px center",
+    start: "-50px 50%",
+    end: "230px 60%",
+    // start: "-50px center",
+    // end: "300px center",
     scrub: true,
     markers: true,
   },

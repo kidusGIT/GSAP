@@ -1876,7 +1876,7 @@ export class ScrollTrigger {
           snap1 = animation && !isToggle ? animation.totalProgress() : clipped;
         }
       }
-      console.log("p ", scroll);
+
       // console.log("progress: ", prevProgress);
       // anticipate the pinning a few ticks ahead of time based on velocity to avoid a visual glitch due to the fact that most browsers do scrolling on a separate thread (not synced with requestAnimationFrame).
       if (
@@ -1902,6 +1902,7 @@ export class ScrollTrigger {
           clipped = 0.9999;
         }
       }
+
       if (clipped !== prevProgress && self.enabled) {
         isActive = self.isActive = !!clipped && clipped < 1;
         wasActive = !!prevProgress && prevProgress < 1;
@@ -1959,7 +1960,8 @@ export class ScrollTrigger {
               scrubTween.invalidate().restart();
             }
           } else if (animation) {
-            // console.log("scroll toggle ", animation._targets[0]);
+            console.log("animation ", animation.scrollTrigger);
+            // console.log("end ", end, " start: ", start, " change ", change);
             animation.totalProgress(
               clipped,
               !!(_refreshing && (lastRefresh || reset))
@@ -2064,6 +2066,7 @@ export class ScrollTrigger {
           onUpdate(self);
         }
       }
+
       // update absolutely-positioned markers (only if the scroller isn't the viewport)
       if (markerEndSetter) {
         let n = containerAnimation

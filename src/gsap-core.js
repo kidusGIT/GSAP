@@ -3676,7 +3676,6 @@ export class Tween extends Animation {
       }
 
       this.ratio = ratio = (yoyoEase || this._ease)(time / dur);
-      // console.log("ratio ", ratio);
       if (this._from) {
         this.ratio = ratio = 1 - ratio;
       }
