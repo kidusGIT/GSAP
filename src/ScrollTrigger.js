@@ -1856,8 +1856,10 @@ export class ScrollTrigger {
       if (containerAnimation && !forceFake && !reset) {
         return;
       }
+      const scrollPosition = window.scrollY;
       let scroll = _refreshingAll === true ? prevScroll : self.scroll(),
-        p = reset ? 0 : (scroll - start) / change,
+        // p = reset ? 0 : (scroll - start) / change,
+        p = reset ? 0 : (scrollPosition - start) / change,
         clipped = p < 0 ? 0 : p > 1 ? 1 : p || 0,
         prevProgress = self.progress,
         isActive,
@@ -1877,7 +1879,6 @@ export class ScrollTrigger {
         }
       }
 
-      // console.log("progress: ", prevProgress);
       // anticipate the pinning a few ticks ahead of time based on velocity to avoid a visual glitch due to the fact that most browsers do scrolling on a separate thread (not synced with requestAnimationFrame).
       if (
         anticipatePin &&
@@ -1960,7 +1961,7 @@ export class ScrollTrigger {
               scrubTween.invalidate().restart();
             }
           } else if (animation) {
-            console.log("animation ", animation.scrollTrigger);
+            // console.log("animation ", animation.scrollTrigger);
             // console.log("end ", end, " start: ", start, " change ", change);
             animation.totalProgress(
               clipped,
