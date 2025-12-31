@@ -36,7 +36,7 @@ gsap.to(".blue", {
   x: 900,
   scrollTrigger: {
     trigger: ".blue", // for multiple targets
-    start: "-50px 50%",
+    start: "top 50%",
     end: "230px 60%",
     // start: "-50px center",
     // end: "300px center",
@@ -44,6 +44,9 @@ gsap.to(".blue", {
     markers: true,
   },
 });
+
+// start = (top + local) - global
+// end = (bottom + local) - global
 
 // let lastScrollTop = 0; // Stores the previous scroll position
 
