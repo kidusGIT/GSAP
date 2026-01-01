@@ -32,11 +32,31 @@ gsap.registerPlugin(ScrollTrigger);
 //   },
 // });
 
+const blue = document.querySelector(".blue");
+const top = blue.getBoundingClientRect().top;
+const bottom = blue.getBoundingClientRect().bottom;
+
+// start = (top + local) - global
+// end = (bottom + local) - global
+
+const start = top + -50 - window.innerHeight * 0.5;
+const end = bottom + 50.5625 - window.innerHeight * 0.6;
+
+console.log("start ", start, " end ", end);
+console.log(
+  "start offset: ",
+  top + 230,
+  "end offset: ",
+  bottom + 50.5625,
+  " diff: ",
+  top + 230 - bottom
+);
+
 gsap.to(".blue", {
   x: 900,
   scrollTrigger: {
     trigger: ".blue", // for multiple targets
-    start: "top 50%",
+    start: "-50px 50%",
     end: "230px 60%",
     // start: "-50px center",
     // end: "300px center",
@@ -44,9 +64,6 @@ gsap.to(".blue", {
     markers: true,
   },
 });
-
-// start = (top + local) - global
-// end = (bottom + local) - global
 
 // let lastScrollTop = 0; // Stores the previous scroll position
 

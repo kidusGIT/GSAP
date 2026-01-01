@@ -1091,6 +1091,7 @@ export class ScrollTrigger {
       top: _getTweenCreator(scroller, _vertical),
       left: _getTweenCreator(scroller, _horizontal),
     };
+
     self.tweenTo = tweenTo = scrollerCache.tweenScroll[direction.p];
     self.scrubDuration = (value) => {
       scrubSmooth = _isNumber(value) && value;
@@ -1110,6 +1111,7 @@ export class ScrollTrigger {
             }));
       }
     };
+
     if (animation) {
       animation.vars.lazy = false;
       (animation._initted && !self.isReverted) ||
@@ -1500,6 +1502,7 @@ export class ScrollTrigger {
       }
       _isFunction(parsedStart) && (parsedStart = parsedStart(self));
       parsedStart = _parseClamp(parsedStart, "start", self);
+
       start =
         _parsePosition(
           parsedStart,
@@ -1517,6 +1520,7 @@ export class ScrollTrigger {
           containerAnimation,
           self._startClamp && "_startClamp"
         ) || (pin ? -0.001 : 0);
+
       _isFunction(parsedEnd) && (parsedEnd = parsedEnd(self));
       if (_isString(parsedEnd) && !parsedEnd.indexOf("+=")) {
         if (~parsedEnd.indexOf(" ")) {
@@ -1961,7 +1965,7 @@ export class ScrollTrigger {
               scrubTween.invalidate().restart();
             }
           } else if (animation) {
-            // console.log("animation ", animation.scrollTrigger);
+            console.log("animation ", animation.scrollTrigger);
             // console.log("end ", end, " start: ", start, " change ", change);
             animation.totalProgress(
               clipped,
