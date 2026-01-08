@@ -2,11 +2,18 @@ import { gsap } from "../../src/index.js";
 import { ScrollTrigger } from "../../src/ScrollTrigger.js";
 gsap.registerPlugin(ScrollTrigger);
 
+const pause = document.getElementById("btn-pause");
+const reverse = document.getElementById("btn-reverse");
+const play = document.getElementById("btn-play");
+const resume = document.getElementById("btn-resume");
+
 // const t = gsap.timeline({
 //   scrollTrigger: {
 //     trigger: [".violet", ".blue"], // for multiple targets
-//     start: "-100px 40%",
-//     end: "300px 50%",
+//     // start: "-100px 40%",
+//     // end: "300px 50%",
+//     start: "-70px 60%",
+//     end: "258px 40%",
 //     scrub: true,
 //     markers: true,
 //     // toggleActions: 'onEnter onLeave onEnterBack onLeaveBack' // make scrub false
@@ -32,18 +39,36 @@ gsap.registerPlugin(ScrollTrigger);
 //   },
 // });
 
-gsap.to(".blue", {
+const t = gsap.to(".blue", {
   x: 900,
+  // duration: 1.5,
   scrollTrigger: {
     trigger: ".blue", // for multiple targets
-    start: "top 50%",
-    end: "230px 60%",
+    start: "-70px 60%",
+    end: "258px 40%",
     // start: "-50px center",
     // end: "300px center",
-    scrub: true,
+    // scrub: true,
     markers: true,
   },
 });
+
+pause.onclick = () => {
+  t.pause();
+};
+
+reverse.onclick = () => {
+  console.log("----------------------------");
+  t.reverse();
+};
+
+play.onclick = () => {
+  t.play();
+};
+
+resume.onclick = () => {
+  t.resume();
+};
 
 // start = (top + local) - global
 // end = (bottom + local) - global

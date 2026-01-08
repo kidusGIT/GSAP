@@ -1961,8 +1961,16 @@ export class ScrollTrigger {
               scrubTween.invalidate().restart();
             }
           } else if (animation) {
+            // console.log(
+            //   "change ",
+            //   change,
+            //   " clipped: ",
+            //   clipped,
+            //   " scroll: ",
+            //   scrollPosition
+            // );
             // console.log("animation ", animation.scrollTrigger);
-            // console.log("end ", end, " start: ", start, " change ", change);
+            console.log("end ", end, " start: ", start, " change ", change);
             animation.totalProgress(
               clipped,
               !!(_refreshing && (lastRefresh || reset))

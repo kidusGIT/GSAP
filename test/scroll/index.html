@@ -38,11 +38,42 @@
         color: white;
         margin: 10px;
       }
+
+      .btn-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        position: fixed;
+        top: 0px;
+        left: 0px;
+        padding: 10px;
+        margin-left: 20px;
+      }
+
+      .btn {
+        padding: 10px;
+        padding-left: 15px;
+        padding-right: 15px;
+        background-color: rgb(25, 92, 179);
+        color: white;
+        border: none;
+        outline: none;
+        border-radius: 7px;
+        cursor: pointer;
+      }
     </style>
 
     <script src="./index.js" type="module" defer></script>
   </head>
   <body>
+    <div class="btn-wrapper">
+      <!-- <button class="btn" id="btn-start">Start</button> -->
+      <button class="btn" id="btn-play">Play</button>
+      <button class="btn" id="btn-reverse">Reverse</button>
+      <button class="btn" id="btn-pause">Pause</button>
+      <button class="btn" id="btn-resume">Resume</button>
+    </div>
+
     <div class="spacer"></div>
     <div class="spacer">
       <div class="card violet">
