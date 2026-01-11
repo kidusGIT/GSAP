@@ -40,15 +40,15 @@ const resume = document.getElementById("btn-resume");
 // });
 
 const t = gsap.to(".blue", {
-  x: 900,
-  // duration: 1.5,
+  x: 700,
+  duration: 1.5,
   scrollTrigger: {
     trigger: ".blue", // for multiple targets
-    start: "-70px 60%",
-    end: "258px 40%",
+    start: "-70px 50%",
+    end: "258px 60%",
     // start: "-50px center",
     // end: "300px center",
-    // scrub: true,
+    scrub: true,
     markers: true,
   },
 });

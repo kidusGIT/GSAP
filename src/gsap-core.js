@@ -3731,7 +3731,7 @@ export class Tween extends Animation {
         ) {
           // if prevTime and tTime are zero, we shouldn't fire the onReverseComplete. This could happen if you gsap.to(... {paused:true}).play();
 
-          console.log("Tween end..... ", this._dur);
+          console.log("Tween end..... ", this);
           _callback(
             this,
             tTime === tDur ? "onComplete" : "onReverseComplete",
