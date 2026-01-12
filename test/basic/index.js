@@ -32,7 +32,7 @@ const t = gsap.to(".ball", {
   // delay: 0.5,
   // stagger: 0.5, // stagger in from the left with a 0.1 second gap in between animations
   stagger: {
-    each: 0.3,
+    each: 0.2,
     from: "center",
   },
   ease: "sine.out",
