@@ -2361,7 +2361,7 @@ export class Timeline extends Animation {
         prevTime = 0; // upon init, the playhead should always go forward; someone could invalidate() a completed timeline and then if they restart(), that would make child tweens render in reverse order which could lock in the wrong starting values if they build on each other, like tl.to(obj, {x: 100}).to(obj, {x: 0}).
       }
       if (!prevTime && tTime && !suppressEvents && !prevIteration) {
-        // console.log("start timeline");
+        console.log("start timeline");
         _callback(this, "onStart");
         if (this._tTime !== tTime) {
           // in case the onStart triggered a render at a different spot, eject. Like if someone did animation.pause(0.5) or something inside the onStart.
@@ -2462,7 +2462,7 @@ export class Timeline extends Animation {
               !(totalTime < 0 && !prevTime) &&
               (tTime || prevTime || !tDur)
             ) {
-              // console.log("Timeline end.....");
+              console.log("Timeline end.....");
               _callback(
                 this,
                 tTime === tDur && totalTime >= 0

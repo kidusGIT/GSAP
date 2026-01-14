@@ -29,11 +29,11 @@ const t = gsap.to(".ball", {
   x: 535,
   scale: 0.5,
   opacity: 1,
-  // delay: 0.5,
-  // stagger: 0.5, // stagger in from the left with a 0.1 second gap in between animations
+  delay: 1.5,
+  // stagger: 0.7, // stagger in from the left with a 0.1 second gap in between animations
   stagger: {
-    each: 0.2,
-    from: "center",
+    each: 0.4,
+    from: "end",
   },
   ease: "sine.out",
 });
