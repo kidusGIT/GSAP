@@ -12,31 +12,48 @@ const resume = document.getElementById("btn-resume");
 //   .to(".red", { duration: 1, x: 535 }, "<-1");
 
 // const t = gsap.timeline();
-// t.to(".green", { duration: 1, x: 535 })
+// t.to(".green", { duration: 1, x: 535, repeat: 3, yoyo: true })
 //   .to(".yellow", { duration: 2, x: 535 })
 //   .to(".red", { duration: 1, x: 535 });
+
+let t = gsap.timeline();
+
+t.to(".green", {
+  x: 535,
+})
+  .to(".green", {
+    y: 100,
+  })
+  .to(".green", {
+    x: 0,
+  })
+  .to(".green", {
+    y: 0,
+  });
 
 // const t = gsap.to(".green", {
 //   duration: 1.5,
 //   x: 535,
 //   // rotation: 360,
-//   // repeat: -1,
+//   repeat: 2,
+//   yoyo: true,
 // });
 
-const t = gsap.to(".ball", {
-  duration: 1,
-  rotation: 180,
-  x: 535,
-  scale: 0.5,
-  opacity: 1,
-  // delay: 0.5,
-  // stagger: 0.5, // stagger in from the left with a 0.1 second gap in between animations
-  stagger: {
-    each: 0.2,
-    from: "center",
-  },
-  ease: "sine.out",
-});
+// const t = gsap.to(".ball", {
+//   duration: 1,
+//   rotation: 180,
+//   x: 535,
+//   scale: 0.5,
+//   opacity: 1,
+//   repeat: 2,
+//   yoyo: true,
+//   stagger: {
+//     each: 0.5,
+//     from: "center",
+//     // yoyo: true,
+//   },
+//   ease: "sine.out",
+// });
 
 pause.onclick = () => {
   t.pause();
