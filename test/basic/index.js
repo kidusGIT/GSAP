@@ -20,22 +20,27 @@ let t = gsap.timeline();
 
 t.to(".green", {
   x: 535,
+  rotation: 180,
+  scale: 0.5,
 })
   .to(".green", {
     y: 100,
+    rotation: 180,
   })
   .to(".green", {
     x: 0,
   })
   .to(".green", {
     y: 0,
+    scale: 1,
   });
 
 // const t = gsap.to(".green", {
 //   duration: 1.5,
-//   x: 535,
-//   // rotation: 360,
-//   repeat: 2,
+//   // x: 535,
+//   rotation: 360,
+//   scale: 0.5,
+//   // repeat: 2,
 //   yoyo: true,
 // });
 
@@ -43,10 +48,11 @@ t.to(".green", {
 //   duration: 1,
 //   rotation: 180,
 //   x: 535,
-//   scale: 0.5,
+//   scaleX: 0.5,
+//   scaleY: 0.5,
 //   opacity: 1,
-//   repeat: 2,
-//   yoyo: true,
+//   // repeat: 2,
+//   // yoyo: true,
 //   stagger: {
 //     each: 0.5,
 //     from: "center",

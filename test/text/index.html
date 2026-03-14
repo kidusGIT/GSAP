@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>GSAP scroll</title>
+    <title>GSAP text animation</title>
 
     <style>
       .spacer {
@@ -62,6 +62,11 @@
         border-radius: 7px;
         cursor: pointer;
       }
+
+      .container {
+        margin-top: 80px;
+        padding-left: 20px;
+      }
     </style>
 
     <script src="./index.js" type="module" defer></script>
@@ -75,29 +80,10 @@
       <button class="btn" id="btn-resume">Resume</button>
     </div>
 
-    <div class="spacer"></div>
-    <div class="spacer">
-      <div class="card violet">
-        <h3>Abebe mola</h3>
-        <span>
-          Lorem ipsum dolor sit amet, consectetur adipisicing elit. Pariatur
-          voluptate sed eveniet, excepturi ut fuga officiis laborum veritatis id
-          soluta ad, veniam aliquam obcaecati neque tenetur! Veniam dolore optio
-          ratione?
-        </span>
-      </div>
+    <div class="container">
+      <h1>
+        This Is the text to animate <span class="animate-text"> Hello </span>
+      </h1>
     </div>
-    <div class="spacer">
-      <div class="card blue">
-        <h3>Abebe mola</h3>
-        <span>
-          Lorem ipsum dolor sit amet, consectetur adipisicing elit. Pariatur
-          voluptate sed eveniet, excepturi ut fuga officiis laborum veritatis id
-          soluta ad, veniam aliquam obcaecati neque tenetur! Veniam dolore optio
-          ratione?
-        </span>
-      </div>
-    </div>
-    <div class="spacer"></div>
   </body>
 </html>
