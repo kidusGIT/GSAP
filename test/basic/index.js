@@ -20,7 +20,7 @@ let t = gsap.timeline();
 
 t.to(".green", {
   x: 535,
-  rotation: 180,
+  rotation: 360,
   scale: 0.5,
 })
   .to(".green", {
@@ -28,7 +28,7 @@ t.to(".green", {
     rotation: 180,
   })
   .to(".green", {
-    x: 0,
+    x: 10,
   })
   .to(".green", {
     y: 0,
@@ -37,11 +37,11 @@ t.to(".green", {
 
 // const t = gsap.to(".green", {
 //   duration: 1.5,
-//   // x: 535,
+//   x: 535,
 //   rotation: 360,
 //   scale: 0.5,
 //   // repeat: 2,
-//   yoyo: true,
+//   // yoyo: true,
 // });
 
 // const t = gsap.to(".ball", {
