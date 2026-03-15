@@ -1777,9 +1777,9 @@ export const CSSPlugin = {
     if (data.tween._time || !_reverting()) {
       let pt = data._pt;
       while (pt) {
-        if (pt.d instanceof GSCache) {
-          console.log("pt.d ", pt.d.y);
-        }
+        // if (pt.d instanceof GSCache) {
+        //   console.log("pt.d ", pt.d.y);
+        // }
         pt.r(ratio, pt.d);
         pt = pt._next;
       }
