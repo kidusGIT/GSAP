@@ -3690,6 +3690,8 @@ export class Tween extends Animation {
         }
       }
 
+      // console.log('vars: ', this._targets[0]._gsap.y)
+
       pt = this._pt;
       while (pt) {
         pt.r(ratio, pt.d);
@@ -3737,8 +3739,8 @@ export class Tween extends Animation {
             this._start,
             " - ",
             this._end,
-            " - ",
-            this._targets,
+            // " - ",
+            // this._targets,
           );
           _callback(
             this,
