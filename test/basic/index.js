@@ -6,15 +6,17 @@ const reverse = document.getElementById("btn-reverse");
 const play = document.getElementById("btn-play");
 const resume = document.getElementById("btn-resume");
 
-let t = gsap.to(".green", {
-  keyframes: {
-    x: [0, 535, 535, 0, 0],
-    y: [0, 0, 100, 100, 0],
-    ease: "power1.inOut",
-  },
-  rotate: 180,
-  duration: 3,
-});
+let t;
+// t = gsap.to(".green", {
+//   keyframes: {
+//     // x: [0, 535, 535, 0, 0],
+//     x: [{ x: 0 }, { x: 535, duration: 1 }, { x: 235, duration: 1.5 }],
+//     // y: [0, 0, 100, 100, 0],
+//     ease: "power1.inOut",
+//   },
+//   // duration: 1,
+//   stagger: 0.1,
+// });
 
 // const t = gsap.timeline();
 // t.to(".green", { duration: 1, x: 535 })
@@ -45,14 +47,14 @@ let t = gsap.to(".green", {
 //     scale: 1,
 //   });
 
-// t = gsap.to(".green", {
-//   duration: 3,
-//   x: 535,
-//   rotation: 180,
-//   // scale: 0.5,
-//   // repeat: 2,
-//   // yoyo: true,
-// });
+t = gsap.to(".green", {
+  duration: 5,
+  x: 535,
+  // rotation: 180,
+  // scale: 0.5,
+  // repeat: 2,
+  // yoyo: true,
+});
 
 // const t = gsap.to(".ball", {
 //   duration: 2,

@@ -1344,9 +1344,17 @@ let _config = {
           time,
           frame;
 
-        (elapsed > _lagThreshold || elapsed < 0) &&
-          (_startTime += elapsed - _adjustedLag);
-
+        if (elapsed > _lagThreshold || elapsed < 0) {
+          console.log(
+            "Elapsed: ",
+            elapsed,
+            ", _lagThreshold: ",
+            _lagThreshold,
+            ", _adjustedLag: ",
+            _adjustedLag,
+          );
+          _startTime += elapsed - _adjustedLag;
+        }
         _lastUpdate += elapsed;
         time = _lastUpdate - _startTime;
 
@@ -1358,6 +1366,8 @@ let _config = {
           _nextTime += overlap + (overlap >= _gap ? 4 : _gap - overlap);
           dispatch = 1;
         }
+
+        // console.log("frame ", elapsed > _lagThreshold || elapsed < 0);
 
         if (startTime === null) {
           // console.log("first");
