@@ -39,19 +39,37 @@ const resume = document.getElementById("btn-resume");
 //   },
 // });
 
-const t = gsap.to(".blue", {
-  x: 700,
-  duration: 1.5,
+const tl = gsap.timeline({
   scrollTrigger: {
-    trigger: ".blue", // for multiple targets
-    start: "-70px 50%",
-    end: "258px 60%",
-    // start: "-50px center",
-    // end: "300px center",
-    scrub: true,
+    scrub: 1,
+    pin: ".wrapper",
+    trigger: ".wrapper",
+    start: "top 20%",
+    // endTrigger: ".wrapper",
+    end: "bottom 50%",
+    // horizontal: true,
     markers: true,
+    // pinSpacing: false,
   },
 });
+
+tl.to(".square", {
+  rotateZ: 900,
+});
+
+// const t = gsap.to(".blue", {
+//   x: 700,
+//   duration: 1.5,
+//   scrollTrigger: {
+//     trigger: ".blue", // for multiple targets
+//     start: "-70px 50%",
+//     end: "258px 60%",
+//     // start: "-50px center",
+//     // end: "300px center",
+//     scrub: true,
+//     markers: true,
+//   },
+// });
 
 pause.onclick = () => {
   t.pause();
