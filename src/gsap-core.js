@@ -3682,7 +3682,6 @@ export class Tween extends Animation {
       }
 
       if (!prevTime && tTime && !suppressEvents && !prevIteration) {
-        console.log("Start tween: ", prevTime, " - ", time);
         _callback(this, "onStart");
         if (this._tTime !== tTime) {
           // in case the onStart triggered a render at a different spot, eject. Like if someone did animation.pause(0.5) or something inside the onStart.
@@ -3739,8 +3738,8 @@ export class Tween extends Animation {
             this._start,
             " - ",
             this._end,
-            // " - ",
-            // this._targets,
+            " - ",
+            this._targets,
           );
           _callback(
             this,

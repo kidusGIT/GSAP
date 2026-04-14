@@ -5,26 +5,31 @@ const pause = document.getElementById("btn-pause");
 const reverse = document.getElementById("btn-reverse");
 const play = document.getElementById("btn-play");
 const resume = document.getElementById("btn-resume");
+const seek = document.getElementById("btn-seek");
 
-let t = gsap.to(".green", {
-  keyframes: {
-    x: [0, 535, 535, 0, 0],
-    y: [0, 0, 100, 100, 0],
-    ease: "power1.inOut",
-  },
-  rotate: 180,
-  duration: 3,
-});
+let t;
+
+// t = gsap.to(".green", {
+//   // keyframes: {
+//   //   x: [0, 535, 535, 0, 0],
+//   //   y: [0, 0, 100, 100, 0],
+//   //   // ease: "power1.inOut",
+//   // },
+//   rotate: 180,
+//   // width: 300,
+//   x: 535,
+//   duration: 3,
+// });
 
 // const t = gsap.timeline();
 // t.to(".green", { duration: 1, x: 535 })
 //   .to(".yellow", { duration: 2, x: 535 }, ">-2")
 //   .to(".red", { duration: 1, x: 535 }, "<-1");
 
-// const t = gsap.timeline();
-// t.to(".green", { duration: 1, x: 535, repeat: 3, yoyo: true })
-//   .to(".yellow", { duration: 2, x: 535 })
-//   .to(".red", { duration: 1, x: 535 });
+t = gsap.timeline();
+t.to(".green", { duration: 1, x: 535 })
+  .to(".yellow", { duration: 1, x: 535 })
+  .to(".red", { duration: 1, x: 535 });
 
 // let t = gsap.timeline();
 
@@ -48,6 +53,7 @@ let t = gsap.to(".green", {
 // t = gsap.to(".green", {
 //   duration: 3,
 //   x: 535,
+//   delay: 1,
 //   rotation: 180,
 //   // scale: 0.5,
 //   // repeat: 2,
@@ -86,6 +92,10 @@ play.onclick = () => {
 
 resume.onclick = () => {
   t.resume();
+};
+
+seek.onclick = () => {
+  t.seek(1.5);
 };
 
 // start.onclick = () => {
