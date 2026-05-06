@@ -2410,6 +2410,8 @@ export class Timeline extends Animation {
       } else {
         child = this._last;
         let adjustedTime = totalTime < 0 ? totalTime : time; //when the playhead goes backward beyond the start of this timeline, we must pass that information down to the child animations so that zero-duration tweens know whether to render their starting or ending values.
+
+        console.log("adjustedTime ", adjustedTime);
         while (child) {
           next = child._prev;
           if (
