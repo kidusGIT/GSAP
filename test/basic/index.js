@@ -28,7 +28,7 @@ let t;
 
 t = gsap.timeline({ repeat: 2, yoyo: true });
 t.to(".green", { duration: 1, x: 535 })
-  .to(".yellow", { duration: 1, x: 535 })
+  .to(".yellow", { duration: 1.3, x: 535 })
   .to(".red", { duration: 1, x: 535 });
 
 // let t = gsap.timeline();
