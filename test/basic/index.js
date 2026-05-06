@@ -26,7 +26,7 @@ let t;
 //   .to(".yellow", { duration: 2, x: 535 }, ">-2")
 //   .to(".red", { duration: 1, x: 535 }, "<-1");
 
-t = gsap.timeline();
+t = gsap.timeline({ repeat: 2, yoyo: true });
 t.to(".green", { duration: 1, x: 535 })
   .to(".yellow", { duration: 1, x: 535 })
   .to(".red", { duration: 1, x: 535 });
@@ -51,13 +51,13 @@ t.to(".green", { duration: 1, x: 535 })
 //   });
 
 // t = gsap.to(".green", {
-//   duration: 3,
+//   duration: 1,
 //   x: 535,
-//   delay: 1,
+//   // delay: 1,
 //   rotation: 180,
 //   // scale: 0.5,
-//   // repeat: 2,
-//   // yoyo: true,
+//   repeat: Infinity,
+//   yoyo: true,
 // });
 
 // const t = gsap.to(".ball", {

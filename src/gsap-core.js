@@ -369,6 +369,7 @@ let _config = {
 	*/
   _postAddChecks = (timeline, child) => {
     let t;
+    console.log("Been here");
     if (
       child._time ||
       (!child._dur && child._initted) ||
@@ -380,6 +381,7 @@ let _config = {
         !child._dur ||
         _clamp(0, child.totalDuration(), t) - child._tTime > _tinyNum
       ) {
+        console.log("Been here render");
         child.render(t, true);
       }
     }
@@ -1365,15 +1367,6 @@ let _config = {
           _self.time = time = time / 1000;
           _nextTime += overlap + (overlap >= _gap ? 4 : _gap - overlap);
           dispatch = 1;
-        }
-
-        // console.log("frame ", elapsed > _lagThreshold || elapsed < 0);
-
-        if (startTime === null) {
-          // console.log("first");
-          startTime = _getTime();
-        } else {
-          // console.log("not first");
         }
 
         manual || (_id = _req(_tick)); //make sure the request is made before we dispatch the "tick" event so that timing is maintained. Otherwise, if processing the "tick" requires a bunch of time (like 15ms) and we're using a setTimeout() that's based on 16.7ms, it'd technically take 31.7ms between frames otherwise.
@@ -2391,6 +2384,10 @@ export class Timeline extends Animation {
             if (child.parent !== this) {
               // an extreme edge case - the child's render could do something like kill() the "next" one in the linked list, or reparent it. In that case we must re-initiate the whole render to be safe.
               return this.render(totalTime, suppressEvents, force);
+            }
+
+            if (!this?.vars?.id) {
+              console.log("time ", time);
             }
 
             child.render(
@@ -3727,6 +3724,8 @@ export class Tween extends Animation {
         !suppressEvents &&
         this.parent &&
         _callback(this, "onRepeat");
+
+      console.log("time tween", time);
 
       if ((tTime === this._tDur || !tTime) && this._tTime === tTime) {
         isNegative &&
