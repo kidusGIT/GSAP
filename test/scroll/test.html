@@ -1,0 +1,530 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Paws & Claws - Native GSAP ScrollTrigger</title>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+    <style>
+      :root {
+        --primary: #ff7a45;
+        --primary-hover: #e06634;
+        --dark: #2d3436;
+        --light: #f9f9f9;
+        --card-bg: #ffffff;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      }
+
+      body {
+        background-color: var(--light);
+        color: var(--dark);
+        line-height: 1.6;
+        overflow-x: hidden;
+      }
+
+      /* Fixed HUD for Scroll Monitoring */
+      #scroll-hud {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background: rgba(0, 0, 0, 0.85);
+        color: #fff;
+        padding: 15px;
+        border-radius: 8px;
+        font-family: monospace;
+        z-index: 9999;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        pointer-events: none;
+        font-size: 14px;
+      }
+
+      /* Progress Bar driven by GSAP ScrollTrigger */
+      #scroll-progress {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 5px;
+        background: var(--primary);
+        z-index: 1000;
+        transform: scaleX(0);
+        transform-origin: left;
+      }
+
+      /* Navigation */
+      nav {
+        background: white;
+        padding: 20px 10%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: sticky;
+        top: 0;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        z-index: 100;
+      }
+
+      nav .logo {
+        font-size: 24px;
+        font-weight: bold;
+        color: var(--primary);
+      }
+
+      nav ul {
+        display: flex;
+        list-style: none;
+      }
+
+      nav ul li {
+        margin-left: 20px;
+      }
+
+      nav ul li a {
+        text-decoration: none;
+        color: var(--dark);
+        font-weight: 600;
+      }
+
+      /* Hero Section */
+      .hero {
+        height: 70vh;
+        background:
+          linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
+          url("https://images.unsplash.com/photo-1548199973-03cce0bbc87b?auto=format&fit=crop&w=1200&q=80")
+            center/cover;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        color: white;
+        text-align: center;
+        padding: 0 20px;
+      }
+
+      .hero h1 {
+        font-size: 48px;
+        margin-bottom: 20px;
+      }
+
+      .hero p {
+        font-size: 20px;
+        margin-bottom: 30px;
+        max-width: 600px;
+      }
+
+      .btn {
+        background: var(--primary);
+        color: white;
+        padding: 12px 30px;
+        text-decoration: none;
+        border-radius: 25px;
+        font-weight: bold;
+        transition: background 0.3s;
+        border: none;
+        cursor: pointer;
+      }
+
+      .btn:hover {
+        background: var(--primary-hover);
+      }
+
+      /* Main Container */
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 60px 20px;
+      }
+
+      .section-title {
+        text-align: center;
+        font-size: 36px;
+        margin-bottom: 40px;
+        position: relative;
+      }
+
+      .section-title::after {
+        content: "";
+        display: block;
+        width: 50px;
+        height: 4px;
+        background: var(--primary);
+        margin: 10px auto 0;
+        border-radius: 2px;
+      }
+
+      /* Cards Grid */
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 30px;
+        margin-bottom: 60px;
+      }
+
+      .card {
+        background: var(--card-bg);
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+
+        /* Set starting CSS states for ScrollTrigger to animate *from* */
+        opacity: 0;
+        transform: translateY(50px) scale(0.9);
+      }
+
+      .card-img {
+        height: 200px;
+        background-size: cover;
+        background-position: center;
+      }
+
+      .card-content {
+        padding: 20px;
+      }
+
+      .card-title {
+        font-size: 20px;
+        margin-bottom: 10px;
+      }
+
+      .card-price {
+        color: var(--primary);
+        font-weight: bold;
+        font-size: 18px;
+        margin-top: 10px;
+      }
+
+      /* Services Section */
+      .services-section {
+        background: #f0f2f5;
+        padding: 60px 0;
+      }
+
+      /* Form / Contact Section */
+      .contact-form {
+        max-width: 600px;
+        margin: 0 auto;
+        background: white;
+        padding: 40px;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+      }
+
+      .form-group label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+      }
+
+      .form-group input,
+      .form-group textarea {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+      }
+
+      /* Footer */
+      footer {
+        background: var(--dark);
+        color: white;
+        text-align: center;
+        padding: 40px 20px;
+        margin-top: 60px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="scroll-progress"></div>
+
+    <div id="scroll-hud">
+      <strong>GSAP ScrollTrigger HUD</strong><br />
+      Scroll Position: <span id="hud-pos">0</span>px<br />
+      Active Cards In View: <span id="hud-active">0</span>
+    </div>
+
+    <nav>
+      <div class="logo">🐾 Paws & Claws</div>
+      <ul>
+        <li><a href="#">Home</a></li>
+        <li><a href="#shop">Shop</a></li>
+        <li><a href="#services">Services</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </nav>
+
+    <section class="hero">
+      <h1 class="hero-title">Everything Your Best Friend Needs</h1>
+      <p class="hero-subtitle">
+        Premium food, toys, and grooming services to keep those tails wagging
+        all day long.
+      </p>
+      <a href="#shop" class="btn hero-btn">Explore Shop</a>
+    </section>
+
+    <section id="shop" class="container">
+      <h2 class="section-title">Featured Products</h2>
+      <div class="grid">
+        <div class="card">
+          <div
+            class="card-img"
+            style="
+              background-image: url(&quot;https://images.unsplash.com/photo-1601758228041-f3b2795255f1?auto=format&fit=crop&w=400&q=80&quot;);
+            "
+          ></div>
+          <div class="card-content">
+            <h3 class="card-title">Organic Dog Kibble</h3>
+            <p>Grain-free, premium protein blend for energetic pups.</p>
+            <div class="card-price">$45.99</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div
+            class="card-img"
+            style="
+              background-image: url(&quot;https://images.unsplash.com/photo-1545249390-6bdfa286032f?auto=format&fit=crop&w=400&q=80&quot;);
+            "
+          ></div>
+          <div class="card-content">
+            <h3 class="card-title">Interactive Cat Toy</h3>
+            <p>Laser and feather combo guaranteed to engage instincts.</p>
+            <div class="card-price">$14.99</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div
+            class="card-img"
+            style="
+              background-image: url(&quot;https://images.unsplash.com/photo-1576201836106-db1758fd1c97?auto=format&fit=crop&w=400&q=80&quot;);
+            "
+          ></div>
+          <div class="card-content">
+            <h3 class="card-title">Orthopedic Dog Bed</h3>
+            <p>Memory foam support for older or tired joints.</p>
+            <div class="card-price">$89.99</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div
+            class="card-img"
+            style="
+              background-image: url(&quot;https://images.unsplash.com/photo-1591584534992-0f341f53896c?auto=format&fit=crop&w=400&q=80&quot;);
+            "
+          ></div>
+          <div class="card-content">
+            <h3 class="card-title">Luxury Cat Tree</h3>
+            <p>Multi-level scratching post with plush hammocks.</p>
+            <div class="card-price">$120.00</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div
+            class="card-img"
+            style="
+              background-image: url(&quot;https://images.unsplash.com/photo-1535268647977-a403b69fc756?auto=format&fit=crop&w=400&q=80&quot;);
+            "
+          ></div>
+          <div class="card-content">
+            <h3 class="card-title">Rubber Chew Toy</h3>
+            <p>Ultra-durable rubber toy for aggressive chewers.</p>
+            <div class="card-price">$12.50</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div
+            class="card-img"
+            style="
+              background-image: url(&quot;https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?auto=format&fit=crop&w=400&q=80&quot;);
+            "
+          ></div>
+          <div class="card-content">
+            <h3 class="card-title">Pet Travel Backpack</h3>
+            <p>Breathable, bubble-window carrier for cats and small dogs.</p>
+            <div class="card-price">$49.99</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div
+            class="card-img"
+            style="
+              background-image: url(&quot;https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=400&q=80&quot;);
+            "
+          ></div>
+          <div class="card-content">
+            <h3 class="card-title">Stylish Dog Sweater</h3>
+            <p>Keep your pup warm and fashionable during winter walks.</p>
+            <div class="card-price">$24.99</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div
+            class="card-img"
+            style="
+              background-image: url(&quot;https://images.unsplash.com/photo-1522069169874-c58ec4b76be5?auto=format&fit=crop&w=400&q=80&quot;);
+            "
+          ></div>
+          <div class="card-content">
+            <h3 class="card-title">Premium Fish Aquarium</h3>
+            <p>5-gallon LED lit aquarium kit with starter filter.</p>
+            <div class="card-price">$65.00</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="services" class="services-section">
+      <div class="container">
+        <h2 class="section-title">Our Services</h2>
+        <div class="grid">
+          <div class="card">
+            <div class="card-content">
+              <h3>✂️ Spa Grooming</h3>
+              <p>
+                Full-service baths, precision haircuts, nail trimming, and ear
+                cleaning provided by certified groomers.
+              </p>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-content">
+              <h3>🐕 Doggy Daycare</h3>
+              <p>
+                Supervised playtime, social activities, and cozy rest zones for
+                your dog while you are at work.
+              </p>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-content">
+              <h3>🏥 Vet Checkups</h3>
+              <p>
+                On-site basic health examinations, vaccinations, and nutritional
+                guidance counseling.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="contact" class="container">
+      <h2 class="section-title">Join the Paws Club</h2>
+      <div class="contact-form">
+        <form onsubmit="event.preventDefault()">
+          <div class="form-group">
+            <label>Your Name</label>
+            <input type="text" placeholder="John Doe" />
+          </div>
+          <div class="form-group">
+            <label>Email Address</label>
+            <input type="email" placeholder="john@example.com" />
+          </div>
+          <div class="form-group">
+            <label>Tell us about your pet</label>
+            <textarea
+              rows="4"
+              placeholder="I have a 2-year old Golden Retriever..."
+            ></textarea>
+          </div>
+          <button class="btn" style="width: 100%">Subscribe for 10% Off</button>
+        </form>
+      </div>
+    </section>
+
+    <footer>
+      <p>
+        &copy; 2026 Paws & Claws Pet Shop. Built with native GSAP ScrollTrigger.
+      </p>
+    </footer>
+
+    <script>
+      // Register the plugin with the core engine
+      gsap.registerPlugin(ScrollTrigger);
+
+      // HUD trackers
+      const hudPos = document.getElementById("hud-pos");
+      const hudActive = document.getElementById("hud-active");
+      let totalActiveCards = 0;
+
+      // Track real-time scroll pixel coordinates inside HUD using a global listener
+      window.addEventListener("scroll", () => {
+        hudPos.textContent = Math.round(window.scrollY);
+      });
+
+      // --- 1. Initial Page Load Animations (CSS layout intro) ---
+      const introTimeline = gsap.timeline();
+      introTimeline
+        .from("nav", { y: -50, opacity: 0, duration: 0.8, ease: "power2.out" })
+        .from(".hero-title", { y: 30, opacity: 0, duration: 0.6 }, "-=0.3")
+        .from(".hero-subtitle", { y: 20, opacity: 0, duration: 0.6 }, "-=0.4")
+        .from(
+          ".hero-btn",
+          { scale: 0.8, opacity: 0, duration: 0.4, ease: "back.out(1.7)" },
+          "-=0.2",
+        );
+
+      // --- 2. ANIMATION A: Reading Progress Indicator ---
+      // This links the width scale of the top bar directly to total page scroll coordinates
+      gsap.to("#scroll-progress", {
+        scaleX: 1,
+        ease: "none",
+        scrollTrigger: {
+          trigger: "body", // Start monitoring at top of document
+          start: "top top", // Begin mapping instantly
+          end: "bottom bottom", // Terminate mapping at page base
+          scrub: true, // "Scrubbing" binds completion precisely to scroll progress bar
+        },
+      });
+
+      // --- 3. ANIMATION B: Card reveals using Staggers and ScrollTrigger ---
+      // Loops through all generated card instances on the page
+      gsap.utils.toArray(".card").forEach((card) => {
+        gsap.to(card, {
+          opacity: 1,
+          y: 0,
+          scale: 1,
+          duration: 0.6,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: card, // The animation triggers based on this individual card
+            start: "top 50%", // Fires when the top of the card reaches 85% view height
+            end: "top 0%", // Ends when the card approaches the top view area
+            toggleActions: "play reverse play reverse", // play entering down, reverse scrolling up
+            markers: true,
+            onEnter: () => updateHudCardCount(1),
+            onLeave: () => updateHudCardCount(-1),
+            onEnterBack: () => updateHudCardCount(1),
+            onLeaveBack: () => updateHudCardCount(-1),
+          },
+        });
+      });
+
+      // Quick counter update helper function for HUD visualization
+      function updateHudCardCount(amount) {
+        totalActiveCards += amount;
+        hudActive.textContent = totalActiveCards;
+      }
+    </script>
+  </body>
+</html>
