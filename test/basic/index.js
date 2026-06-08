@@ -26,6 +26,11 @@ let t;
 //   .to(".yellow", { duration: 2, x: 535 }, ">-2")
 //   .to(".red", { duration: 1, x: 535 }, "<-1");
 
+// t = gsap.timeline({ repeat: 2, yoyo: true });
+// t.to(".green", { duration: 1, x: 535 })
+//   .to(".yellow", { duration: 1.3, x: 535 })
+//   .to(".red", { duration: 1, x: 535 });
+
 gsap.from(".green", { duration: 1, x: 535 });
 
 // t = gsap.timeline({ repeat: 2, yoyo: true });

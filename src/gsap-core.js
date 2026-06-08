@@ -1361,6 +1361,7 @@ let _config = {
         time = _lastUpdate - _startTime;
 
         overlap = time - _nextTime;
+        console.log("t ", time);
         if (overlap > 0 || manual) {
           frame = ++_self.frame;
           _delta = time - _self.time * 1000;
