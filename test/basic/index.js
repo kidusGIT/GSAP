@@ -31,19 +31,58 @@ let t;
 //   .to(".yellow", { duration: 1.3, x: 535 })
 //   .to(".red", { duration: 1, x: 535 });
 
-// t = gsap.to(".green", {
-//   duration: 2.2,
-//   keyframes: [
-//     { x: 535, opacity: 1, scale: 0.6, ease: "power2.out", duration: 0.9 },
-//     { y: -40, rotation: -12, ease: "sine.out", duration: 0.6 },
-//     { y: 0, rotation: 0, scale: 1, ease: "bounce.out", duration: 0.7 },
-//   ],
-// });
+t = gsap.to(".green", {
+  duration: 4,
+  // repeat: -1,
+  // yoyo: false,
+  keyframes: {
+    "0%": {
+      x: 0,
+      // y: 0,
+      scale: 1,
+      rotation: 0,
+      backgroundColor: "green",
+      ease: "none",
+    },
+    "25%": {
+      x: 500,
+      // y: -30,
+      scale: 0.4,
+      rotation: 20,
+      backgroundColor: "#1971c2",
+      ease: "power1.out",
+    },
+    "50%": {
+      x: 200,
+      // y: 0,
+      scale: 1,
+      rotation: 0,
+      backgroundColor: "#e67700",
+      ease: "power1.inOut",
+    },
+    "75%": {
+      x: 140,
+      // y: 30,
+      scale: 0.9,
+      rotation: -20,
+      backgroundColor: "#c2255c",
+      ease: "power1.in",
+    },
+    // "100%": {
+    //   x: 0,
+    //   y: 0,
+    //   scale: 1,
+    //   rotation: 0,
+    //   backgroundColor: "green",
+    //   ease: "none",
+    // },
+  },
+});
 
-t = gsap.timeline();
-t.to(".green", { duration: 1, x: 535 })
-  .from(".yellow", { duration: 1, x: 535 })
-  .to(".red", { duration: 1, x: 535 });
+// t = gsap.timeline();
+// t.to(".green", { duration: 1, x: 535 })
+//   .from(".yellow", { duration: 1, x: 535 })
+//   .to(".red", { duration: 1, x: 535 });
 
 // let t = gsap.timeline();
 
