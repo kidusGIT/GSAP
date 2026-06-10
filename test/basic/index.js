@@ -31,12 +31,19 @@ let t;
 //   .to(".yellow", { duration: 1.3, x: 535 })
 //   .to(".red", { duration: 1, x: 535 });
 
-t = gsap.from(".green", { duration: 1, x: 535 });
+// t = gsap.to(".green", {
+//   duration: 2.2,
+//   keyframes: [
+//     { x: 535, opacity: 1, scale: 0.6, ease: "power2.out", duration: 0.9 },
+//     { y: -40, rotation: -12, ease: "sine.out", duration: 0.6 },
+//     { y: 0, rotation: 0, scale: 1, ease: "bounce.out", duration: 0.7 },
+//   ],
+// });
 
-// t = gsap.timeline({ repeat: 2, yoyo: true });
-// t.to(".green", { duration: 1, x: 535 })
-//   .to(".yellow", { duration: 1, x: 535 })
-//   .to(".red", { duration: 1, x: 535 });
+t = gsap.timeline();
+t.to(".green", { duration: 1, x: 535 })
+  .from(".yellow", { duration: 1, x: 535 })
+  .to(".red", { duration: 1, x: 535 });
 
 // let t = gsap.timeline();
 
@@ -67,8 +74,8 @@ t = gsap.from(".green", { duration: 1, x: 535 });
 //   yoyo: true,
 // });
 
-// const t = gsap.to(".ball", {
-//   duration: 2,
+// t = gsap.from(".ball", {
+//   duration: 1,
 //   rotation: 180,
 //   x: 535,
 //   scaleX: 0.5,
