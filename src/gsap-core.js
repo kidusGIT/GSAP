@@ -2386,10 +2386,6 @@ export class Timeline extends Animation {
               return this.render(totalTime, suppressEvents, force);
             }
 
-            if (!this?.vars?.id) {
-              console.log("time ", time);
-            }
-
             child.render(
               child._ts > 0
                 ? (time - child._start) * child._ts
@@ -3726,8 +3722,6 @@ export class Tween extends Animation {
         !suppressEvents &&
         this.parent &&
         _callback(this, "onRepeat");
-
-      console.log("time tween", time);
 
       if ((tTime === this._tDur || !tTime) && this._tTime === tTime) {
         isNegative &&
