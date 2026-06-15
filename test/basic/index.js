@@ -9,17 +9,20 @@ const seek = document.getElementById("btn-seek");
 
 let t;
 
-// t = gsap.to(".green", {
-//   // keyframes: {
-//   //   x: [0, 535, 535, 0, 0],
-//   //   y: [0, 0, 100, 100, 0],
-//   //   // ease: "power1.inOut",
-//   // },
-//   rotate: 180,
-//   // width: 300,
-//   x: 535,
-//   duration: 3,
-// });
+t = gsap.to(".green", {
+  // keyframes: {
+  //   x: [0, 535, 535, 0, 0],
+  //   y: [0, 0, 100, 100, 0],
+  //   // ease: "power1.inOut",
+  // },
+  // rotate: 180,
+  // width: 300,
+  // ease: "bounce.in",
+  ease: "sine.out",
+  // ease: "power2.out",
+  y: 355,
+  duration: 1.5,
+});
 
 // const t = gsap.timeline();
 // t.to(".green", { duration: 1, x: 535 })
@@ -31,64 +34,64 @@ let t;
 //   .to(".yellow", { duration: 1.3, x: 535 })
 //   .to(".red", { duration: 1, x: 535 });
 
-t = gsap.to(".green", {
-  duration: 4,
-  repeat: 2,
-  yoyo: true,
-  keyframes: {
-    x: [0, 535, 535, 0, 0],
-    y: [0, 0, 100, 100, 0],
+// t = gsap.to(".green", {
+//   duration: 4,
+//   repeat: 2,
+//   yoyo: true,
+//   keyframes: {
+//     x: [0, 535, 535, 0, 0],
+//     y: [0, 0, 100, 100, 0],
 
-    //   // "0%": {
-    //   //   x: 0,
-    //   //   y: 0,
-    //   //   backgroundColor: "green",
-    //   //   // scale: 1,
-    //   //   // rotation: 0,
-    //   //   ease: "none",
-    //   // },
-    //   // "25%": {
-    //   //   x: 535,
-    //   //   y: 0,
-    //   //   backgroundColor: "#1971c2",
-    //   //   // scale: 0.4,
-    //   //   // rotation: 20,
-    //   //   duration: 2,
-    //   //   ease: "power1.out",
-    //   // },
-    //   // "50%": {
-    //   //   x: 535,
-    //   //   y: 100,
-    //   //   backgroundColor: "#e67700",
-    //   //   // scale: 1,
-    //   //   // rotation: 0,
-    //   //   ease: "power1.inOut",
-    //   // },
-    //   // "75%": {
-    //   //   x: 0,
-    //   //   y: 100,
-    //   //   backgroundColor: "#c2255c",
-    //   //   // scale: 0.9,
-    //   //   // rotation: -20,
-    //   //   ease: "power1.in",
-    //   // },
-    //   // "100%": {
-    //   //   x: 0,
-    //   //   y: 0,
-    //   //   backgroundColor: "green",
-    //   //   // scale: 1,
-    //   //   // rotation: 0,
-    //   //   ease: "none",
-    //   // },
-  },
-  // keyframes: [
-  //   { x: 0, y: 0, ease: "none" },
-  //   { x: 535, y: 0, duration: 2, ease: "power1.out" },
-  //   { x: 535, y: 100, ease: "power1.inOut" },
-  //   { x: 0, y: 100, ease: "power1.in" },
-  //   { x: 0, y: 0, ease: "none" },
-  // ],
-});
+//     //   // "0%": {
+//     //   //   x: 0,
+//     //   //   y: 0,
+//     //   //   backgroundColor: "green",
+//     //   //   // scale: 1,
+//     //   //   // rotation: 0,
+//     //   //   ease: "none",
+//     //   // },
+//     //   // "25%": {
+//     //   //   x: 535,
+//     //   //   y: 0,
+//     //   //   backgroundColor: "#1971c2",
+//     //   //   // scale: 0.4,
+//     //   //   // rotation: 20,
+//     //   //   duration: 2,
+//     //   //   ease: "power1.out",
+//     //   // },
+//     //   // "50%": {
+//     //   //   x: 535,
+//     //   //   y: 100,
+//     //   //   backgroundColor: "#e67700",
+//     //   //   // scale: 1,
+//     //   //   // rotation: 0,
+//     //   //   ease: "power1.inOut",
+//     //   // },
+//     //   // "75%": {
+//     //   //   x: 0,
+//     //   //   y: 100,
+//     //   //   backgroundColor: "#c2255c",
+//     //   //   // scale: 0.9,
+//     //   //   // rotation: -20,
+//     //   //   ease: "power1.in",
+//     //   // },
+//     //   // "100%": {
+//     //   //   x: 0,
+//     //   //   y: 0,
+//     //   //   backgroundColor: "green",
+//     //   //   // scale: 1,
+//     //   //   // rotation: 0,
+//     //   //   ease: "none",
+//     //   // },
+//   },
+//   // keyframes: [
+//   //   { x: 0, y: 0, ease: "none" },
+//   //   { x: 535, y: 0, duration: 2, ease: "power1.out" },
+//   //   { x: 535, y: 100, ease: "power1.inOut" },
+//   //   { x: 0, y: 100, ease: "power1.in" },
+//   //   { x: 0, y: 0, ease: "none" },
+//   // ],
+// });
 
 // t = gsap.timeline();
 // t.to(".green", { duration: 1, x: 535 })

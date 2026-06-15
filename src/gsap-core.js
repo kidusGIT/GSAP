@@ -4695,6 +4695,7 @@ export const {
   Expo,
   Circ,
 } = _easeMap;
+
 export {
   Tween as TweenMax,
   Tween as TweenLite,
