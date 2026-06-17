@@ -1649,6 +1649,9 @@ _easeMap.SteppedEase =
           p2 = steps + (immediateStart ? 0 : 1),
           p3 = immediateStart ? 1 : 0,
           max = 1 - _tinyNum;
+
+        // Use "|" to floor the value instead of Math.floor() because it's faster. The tradeoff is that it only works for positive numbers, but since we're clamping the value between 0 and 1, it's fine.
+        // max must be between 0 to 0.9999999999 because if it's 1, then the last step will never be reached due to the way the math works out. so wil get a value grater than 1
         return (p) => (((p2 * _clamp(0, max, p)) | 0) + p3) * p1;
       },
     };
@@ -3681,6 +3684,9 @@ export class Tween extends Animation {
       }
 
       this.ratio = ratio = (yoyoEase || this._ease)(time / dur);
+
+      console.log("ratio ", ratio);
+
       if (this._from) {
         this.ratio = ratio = 1 - ratio;
       }
