@@ -18,17 +18,10 @@ t = gsap.to(".green", {
   // rotate: 180,
   // width: 300,
   // ease: "bounce.in",
+  // ease: "sine.in",
+  ease: "elastic.out(1,0.3)",
   // ease: "steps(6)",
   // ease: "power2.out",
-
-  ease: `rough({
-    template:none.out,
-    strength: 1,
-    points:20,
-    taper:none,
-    randomize:true,
-    clamp:false
-    })`,
   y: 355,
   duration: 1.5,
 });

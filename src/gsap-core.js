@@ -369,7 +369,6 @@ let _config = {
 	*/
   _postAddChecks = (timeline, child) => {
     let t;
-    console.log("Been here");
     if (
       child._time ||
       (!child._dur && child._initted) ||
@@ -1798,7 +1797,6 @@ export class Animation {
   }
 
   totalProgress(value, suppressEvents) {
-    // console.log("scrolles ", value);
     return arguments.length
       ? this.totalTime(this.totalDuration() * value, suppressEvents)
       : this.totalDuration()
@@ -2356,7 +2354,6 @@ export class Timeline extends Animation {
         }
       }
 
-      // console.log("time ", time, " tTime", tTime, "this._time ", this._tTime);
       this._tTime = tTime;
       this._time = time;
       this._act = !timeScale; //as long as it's not paused, force it to be active so that if the user renders independent of the parent timeline, it'll be forced to re-render on the next tick.
@@ -3684,8 +3681,6 @@ export class Tween extends Animation {
       }
 
       this.ratio = ratio = (yoyoEase || this._ease)(time / dur);
-
-      console.log("ratio ", ratio);
 
       if (this._from) {
         this.ratio = ratio = 1 - ratio;
