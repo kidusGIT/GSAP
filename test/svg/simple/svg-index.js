@@ -11,7 +11,7 @@ const resume = document.getElementById("btn-resume");
 const seek = document.getElementById("btn-seek");
 
 let t;
-t = gsap.to("#diamond", { morphSVG: "#lightning", duration: 1.5 });
+t = gsap.to("#diamond", { morphSVG: "#facebook", duration: 1.5 });
 
 pause.onclick = () => {
   t.pause();
