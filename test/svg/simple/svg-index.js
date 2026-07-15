@@ -12,15 +12,15 @@ const seek = document.getElementById("btn-seek");
 
 let t;
 t = gsap.to("#diamond", {
-  // morphSVG: "#facebook",
-  morphSVG: {
-    shape: "#facebook",
-    type: "rotational",
-    // shapeIndex: 10,
-    // origin: "60%,85% ", //or "20% 60%,35% 90%" if there are different values for the start and end shapes.
-  },
+  morphSVG: "#triangle",
+  // morphSVG: {
+  //   shape: "#facebook",
+  //   type: "rotational",
+  //   // shapeIndex: 10,
+  //   // origin: "60%,85% ", //or "20% 60%,35% 90%" if there are different values for the start and end shapes.
+  // },
   duration: 1.5,
-  // ease: "bounce.out",
+  ease: "bounce.out",
 });
 
 pause.onclick = () => {
