@@ -12,7 +12,7 @@ const seek = document.getElementById("btn-seek");
 
 let t;
 t = gsap.to("#diamond", {
-  morphSVG: "#triangle",
+  morphSVG: "#lightning",
   // morphSVG: {
   //   shape: "#facebook",
   //   type: "rotational",
@@ -20,7 +20,7 @@ t = gsap.to("#diamond", {
   //   // origin: "60%,85% ", //or "20% 60%,35% 90%" if there are different values for the start and end shapes.
   // },
   duration: 1.5,
-  ease: "bounce.out",
+  // ease: "bounce.out",
 });
 
 pause.onclick = () => {
