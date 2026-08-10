@@ -12,7 +12,7 @@ const seek = document.getElementById("btn-seek");
 
 let t;
 t = gsap.to("#diamond", {
-  morphSVG: "#triangle",
+  morphSVG: "#lightning",
   // morphSVG: {
   //   shape: "#facebook",
   //   type: "rotational",
