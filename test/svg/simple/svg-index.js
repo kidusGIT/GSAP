@@ -20,7 +20,7 @@ t = gsap.to("#diamond", {
   //   // origin: "60%,85% ", //or "20% 60%,35% 90%" if there are different values for the start and end shapes.
   // },
   duration: 1.5,
-  ease: "bounce.out",
+  // ease: "bounce.out",
 });
 
 pause.onclick = () => {
