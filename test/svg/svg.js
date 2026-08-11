@@ -42,22 +42,33 @@ function getCubicArcLength(p, t1 = 0, t2 = 1) {
   return halfLength * length;
 }
 
-// Newton-Raphson to find t for a specific arc length on a single curve
+// Bisection search: robust against zero-speed endpoints
 function findTForLength(p, targetLen, totalLen, tolerance = 1e-6) {
-  let t = Math.max(0, Math.min(1, targetLen / totalLen));
-  for (let i = 0; i < 20; i++) {
+  if (!totalLen || totalLen <= 0) return 0;
+  if (targetLen <= 0) return 0;
+  if (targetLen >= totalLen) return 1;
+
+  let low = 0;
+  let high = 1;
+  let t = targetLen / totalLen;
+
+  for (let i = 0; i < 30; i++) {
     const curLen = getCubicArcLength(p, 0, t);
     const error = curLen - targetLen;
+
     if (Math.abs(error) < tolerance) break;
-    const speed = getCubicSpeed(p, t);
-    if (speed === 0) break;
-    t = t - error / speed;
-    t = Math.max(0, Math.min(1, t));
+
+    if (error > 0) {
+      high = t;
+    } else {
+      low = t;
+    }
+    t = (low + high) / 2;
   }
-  return t;
+  return isNaN(t) ? 0 : Math.max(0, Math.min(1, t));
 }
 
-// De Casteljau's algorithm to split a cubic Bezier at local t
+// De Casteljau's algorithm to split a cubic Bezier
 function splitCubicBezier(p, t) {
   const lerp = (pA, pB, t) => ({
     x: pA.x + (pB.x - pA.x) * t,
@@ -73,21 +84,30 @@ function splitCubicBezier(p, t) {
 
   const p0123 = lerp(p012, p123, t);
 
-  return [
-    [p[0], p01, p012, p0123],
-    [p0123, p123, p23, p[3]],
-  ];
+  const leftCurve = [p[0], p01, p012, p0123];
+  const rightCurve = [p0123, p123, p23, p[3]];
+
+  return [leftCurve, rightCurve];
 }
 
-// Slice a cubic Bezier between local parameters t1 and t2
+// Safe slice with full division-by-zero protection
 function sliceCubicBezier(p, t1, t2) {
+  t1 = Math.max(0, Math.min(1, t1));
+  t2 = Math.max(0, Math.min(1, t2));
+
+  if (t1 > t2) [t1, t2] = [t2, t1];
+  if (Math.abs(t2 - t1) < 1e-6) return null;
   if (t1 === 0 && t2 === 1) return p;
   if (t1 === 0) return splitCubicBezier(p, t2)[0];
   if (t2 === 1) return splitCubicBezier(p, t1)[1];
 
-  // Trim left first, then right relative to remaining curve
   const [, right] = splitCubicBezier(p, t1);
-  const t2Remapped = (t2 - t1) / (1 - t1);
+  const denominator = 1 - t1;
+
+  // Prevent divide-by-zero NaN
+  if (denominator < 1e-7) return null;
+
+  const t2Remapped = Math.max(0, Math.min(1, (t2 - t1) / denominator));
   const [middle] = splitCubicBezier(right, t2Remapped);
   return middle;
 }
@@ -137,22 +157,13 @@ function parseCubicSvgPath(d) {
 }
 
 // ==========================================
-// 3. GLOBAL CONTINUOUS SUBDIVISION ENGINE
+// 3. CONTINUOUS SUBDIVISION ENGINE
 // ==========================================
 
-/**
- * Subdivides ANY SVG path containing Cubic (C) commands into N equal arc-length segments.
- *
- * @param {string} dPath - Input SVG path 'd' string
- * @param {number} totalSegments - Total equal segments desired across the entire path
- * @param {number} precision - Rounding precision for SVG numbers
- * @returns {string} Subdivided SVG path string
- */
-function subdivideCubicSvgPath(dPath, totalSegments, precision = 4) {
+function subdivideCubicSvgPath(dPath, targetSegments, precision = 4) {
   const { curves, isClosed } = parseCubicSvgPath(dPath);
   if (curves.length === 0) return dPath;
 
-  // 1. Build global cumulative distance map
   const totalLength = curves.reduce((sum, c) => sum + c.length, 0);
   if (totalLength === 0) return dPath;
 
@@ -163,12 +174,17 @@ function subdivideCubicSvgPath(dPath, totalSegments, precision = 4) {
     cumulativeLengths.push(currentAccum);
   }
 
-  // Helper to convert global length [0, totalLength] -> { curveIndex, localT }
   function locateGlobalDistance(dist) {
     const clampedDist = Math.max(0, Math.min(totalLength, dist));
 
-    // Find curve index containing this distance
-    let idx = cumulativeLengths.findIndex((len) => len >= clampedDist - 1e-7);
+    if (clampedDist >= totalLength - 1e-7) {
+      return { curveIdx: curves.length - 1, t: 1 };
+    }
+    if (clampedDist <= 1e-7) {
+      return { curveIdx: 0, t: 0 };
+    }
+
+    let idx = cumulativeLengths.findIndex((len) => len > clampedDist);
     if (idx === -1) idx = curves.length - 1;
 
     const prevLen = idx === 0 ? 0 : cumulativeLengths[idx - 1];
@@ -182,11 +198,10 @@ function subdivideCubicSvgPath(dPath, totalSegments, precision = 4) {
     return { curveIdx: idx, t: localT };
   }
 
-  const segmentLength = totalLength / totalSegments;
+  const segmentLength = totalLength / targetSegments;
   const resultCurves = [];
 
-  // 2. Extract each equal segment slice across boundaries
-  for (let i = 0; i < totalSegments; i++) {
+  for (let i = 0; i < targetSegments; i++) {
     const startDist = i * segmentLength;
     const endDist = (i + 1) * segmentLength;
 
@@ -194,42 +209,43 @@ function subdivideCubicSvgPath(dPath, totalSegments, precision = 4) {
     const endLoc = locateGlobalDistance(endDist);
 
     if (startLoc.curveIdx === endLoc.curveIdx) {
-      // Piece lies entirely within one curve
       const sliced = sliceCubicBezier(
         curves[startLoc.curveIdx].points,
         startLoc.t,
         endLoc.t,
       );
-      resultCurves.push(sliced);
+      if (sliced) resultCurves.push(sliced);
     } else {
-      // Piece spans across 2 or more curves
-      // First part: tail of start curve
-      const head = sliceCubicBezier(
-        curves[startLoc.curveIdx].points,
-        startLoc.t,
-        1,
-      );
-      resultCurves.push(head);
+      // Tail of initial curve
+      if (startLoc.t < 1 - 1e-6) {
+        const head = sliceCubicBezier(
+          curves[startLoc.curveIdx].points,
+          startLoc.t,
+          1,
+        );
+        if (head) resultCurves.push(head);
+      }
 
-      // Middle parts: any full curves in-between
+      // Middle complete curves
       for (let c = startLoc.curveIdx + 1; c < endLoc.curveIdx; c++) {
         resultCurves.push(curves[c].points);
       }
 
-      // Last part: head of end curve
-      if (endLoc.t > 0) {
+      // Head of final curve
+      if (endLoc.t > 1e-6) {
         const tail = sliceCubicBezier(
-          curves[endLoc.curveIdx].points,
+          curves[endLoc.endLoc || endLoc.curveIdx].points,
           0,
           endLoc.t,
         );
-        resultCurves.push(tail);
+        if (tail) resultCurves.push(tail);
       }
     }
   }
 
-  // 3. Serialise into SVG path string format
-  const formatNum = (n) => Number(n.toFixed(precision));
+  if (resultCurves.length === 0) return dPath;
+
+  const formatNum = (n) => (isNaN(n) ? 0 : Number(n.toFixed(precision)));
   const startPoint = resultCurves[0][0];
   let dResult = `M ${formatNum(startPoint.x)} ${formatNum(startPoint.y)}`;
 
@@ -245,11 +261,8 @@ function subdivideCubicSvgPath(dPath, totalSegments, precision = 4) {
   return dResult;
 }
 
-const inputPath = "M 50 1 C 50 1, 99 50, 99 50 Z";
-// const inputPath =
-//   "M 50 1 C 50 1, 99 50, 99 50 C 99 50, 50 99, 50 99 C 50 99, 1 50, 1 50 C 1 50, 50 1, 50 1 Z";
-
-// Subdivide each of the 4 Bezier curves in the path into 2 equal parts (8 segments total)
-const resultPath = subdivideCubicSvgPath(inputPath, 7);
-
+// Example Execution:
+const inputPath =
+  "M2 4C2 4 34.1774 4 34.1774 4C34.1774 4 34.1774 35.4113 34.1774 35.4113C34.1774 35.4113 64.8226 35.4113 64.8226 35.4113C64.8226 35.4113 64.8226 4 64.8226 4C64.8226 4 97 4 97 4C97 4 97 36.1774 97 36.1774C97 36.1774 65.5887 36.1774 65.5887 36.1774C65.5887 36.1774 65.5887 66.8226 65.5887 66.8226C65.5887 66.8226 97 66.8226 97 66.8226C97 66.8226 97 99 97 99C97 99 64.8226 99 64.8226 99C64.8226 99 64.8226 67.5887 64.8226 67.5887C64.8226 67.5887 34.1774 67.5887 34.1774 67.5887C34.1774 67.5887 34.1774 99 34.1774 99C34.1774 99 2 99 2 99C2 99 2 66.8226 2 66.8226C2 66.8226 33.4113 66.8226 33.4113 66.8226C33.4113 66.8226 33.4113 36.1774 33.4113 36.1774C33.4113 36.1774 2 36.1774 2 36.1774C2 36.1774 2 4 2 4Z";
+const resultPath = subdivideCubicSvgPath(inputPath, 8);
 console.log(resultPath);
