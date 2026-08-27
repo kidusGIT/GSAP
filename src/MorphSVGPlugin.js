@@ -78,6 +78,7 @@ let gsap,
         yMin = y;
       }
     }
+
     segment.centerX = (xMax + xMin) / 2;
     segment.centerY = (yMax + yMin) / 2;
     return (segment.size = (xMax - xMin) * (yMax - yMin));
@@ -324,6 +325,7 @@ let gsap,
         y2 = cp1y + (cp2y - cp1y) * t;
         y1 += (y2 - y1) * t;
         y2 += (cp2y + (by - cp2y) * t - y2) * t;
+
         segment.splice(
           i,
           4,
@@ -370,6 +372,7 @@ let gsap,
     if (!shorter[0]) {
       return;
     }
+
     if (longer.length > 1) {
       start.sort(sortMethod);
       end.sort(sortMethod);
@@ -394,6 +397,7 @@ let gsap,
         }
       }
     }
+
     if (dif) {
       if (dif < 0) {
         dif = -dif;
@@ -416,6 +420,7 @@ let gsap,
         added++;
       }
     }
+
     for (i = 0; i < start.length; i++) {
       eb = end[i];
       sb = start[i];

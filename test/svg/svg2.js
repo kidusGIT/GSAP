@@ -286,3 +286,119 @@ const inputPath =
 // Subdivide into 16 equal arc-length segments
 const resultPath = subdivideCubicSvgPath(inputPath, 15);
 console.log(resultPath);
+
+
+/**
+ * Normalizes an SVG path into explicit Cubic Béziers (C) 
+ * and appends a specified number of collapsed points.
+ * 
+ * @param {string} pathString - Original SVG path d-attribute
+ * @param {number} extraPointsCount - Number of collapsed points to append
+ * @returns {string} - Updated SVG path string
+ */
+function addCollapsedPoints(pathString, extraPointsCount) {
+  // 1. Clean and tokenize the path string into commands and numbers
+  const tokens = pathString.match(/([a-zA-Z])|([-+]?\d*\.?\d+(?:e[-+]?\d+)?)/gi);
+  if (!tokens) return pathString;
+
+  let currentCmd = '';
+  let coords = [];
+  let currentPoint = { x: 0, y: 0 };
+  let startPoint = { x: 0, y: 0 };
+  
+  const parsedCommands = [];
+
+  let i = 0;
+  while (i < tokens.length) {
+    let token = tokens[i];
+
+    // If token is an alphabetic command, update current command
+    if (/^[a-zA-Z]$/.test(token)) {
+      currentCmd = token;
+      i++;
+    }
+
+    // Process parameters based on active command
+    if (currentCmd === 'M' || currentCmd === 'm') {
+      let x = parseFloat(tokens[i++]);
+      let y = parseFloat(tokens[i++]);
+      
+      if (currentCmd === 'm') {
+        x += currentPoint.x;
+        y += currentPoint.y;
+      }
+
+      currentPoint = { x, y };
+      startPoint = { x, y };
+      parsedCommands.push(`M${x},${y}`);
+
+      // Any subsequent number pairs after 'M' implicitly act as 'L' (Lines)
+      while (i < tokens.length && !/^[a-zA-Z]$/.test(tokens[i])) {
+        let lx = parseFloat(tokens[i++]);
+        let ly = parseFloat(tokens[i++]);
+        parsedCommands.push(`C${currentPoint.x},${currentPoint.y} ${lx},${ly} ${lx},${ly}`);
+        currentPoint = { x: lx, y: ly };
+      }
+    } 
+    else if (currentCmd === 'L' || currentCmd === 'l') {
+      let lx = parseFloat(tokens[i++]);
+      let ly = parseFloat(tokens[i++]);
+      
+      if (currentCmd === 'l') {
+        lx += currentPoint.x;
+        ly += currentPoint.y;
+      }
+
+      // Convert Line to Cubic Bézier: C (startX,startY) (endX,endY) (endX,endY)
+      parsedCommands.push(`C${currentPoint.x},${currentPoint.y} ${lx},${ly} ${lx},${ly}`);
+      currentPoint = { x: lx, y: ly };
+    } 
+    else if (currentCmd === 'C' || currentCmd === 'c') {
+      let x1 = parseFloat(tokens[i++]), y1 = parseFloat(tokens[i++]);
+      let x2 = parseFloat(tokens[i++]), y2 = parseFloat(tokens[i++]);
+      let x  = parseFloat(tokens[i++]), y  = parseFloat(tokens[i++]);
+
+      if (currentCmd === 'c') {
+        x1 += currentPoint.x; y1 += currentPoint.y;
+        x2 += currentPoint.x; y2 += currentPoint.y;
+        x  += currentPoint.x; y  += currentPoint.y;
+      }
+
+      parsedCommands.push(`C${x1},${y1} ${x2},${y2} ${x},${y}`);
+      currentPoint = { x, y };
+    } 
+    else if (currentCmd === 'Z' || currentCmd === 'z') {
+      parsedCommands.push('z');
+      currentPoint = { ...startPoint };
+    }
+  }
+
+  // 2. Identify insertion point (the last coordinate before 'z' or end of path)
+  const lastPoint = { ...currentPoint };
+  const collapsedCmd = `C${lastPoint.x},${lastPoint.y} ${lastPoint.x},${lastPoint.y} ${lastPoint.x},${lastPoint.y}`;
+
+  // 3. Append the specified number of collapsed points
+  const collapsedPoints = Array(extraPointsCount).fill(collapsedCmd);
+
+  // Place collapsed points right before 'z' if it exists
+  const hasClose = parsedCommands[parsedCommands.length - 1].toLowerCase() === 'z';
+  if (hasClose) {
+    parsedCommands.splice(parsedCommands.length - 1, 0, ...collapsedPoints);
+  } else {
+    parsedCommands.push(...collapsedPoints);
+  }
+
+  return parsedCommands.join(' ');
+}
+
+// --- Example Usage ---
+
+const originalPath = "M47.1,0.8 73.3,0.8 61.9,37.2 77.1,37.2 30.7,99.4 45.8,51.9 29,51.9z";
+
+// Add 4 collapsed points
+const updatedPath = addCollapsedPoints(originalPath, 4);
+
+console.log("Resulting Path:");
+console.log(updatedPath);
+
+// C 29, 51.9 29,51.9 29,51.9 C 29,51.9 29,51.9 29,51.9 C 29,51.9 29,51.9 29,51.9 C 29,51.9 29,51.9 29,51.9
