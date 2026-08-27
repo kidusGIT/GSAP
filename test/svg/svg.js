@@ -264,5 +264,68 @@ function subdivideCubicSvgPath(dPath, targetSegments, precision = 4) {
 // Example Execution:
 const inputPath =
   "M2 4C2 4 34.1774 4 34.1774 4C34.1774 4 34.1774 35.4113 34.1774 35.4113C34.1774 35.4113 64.8226 35.4113 64.8226 35.4113C64.8226 35.4113 64.8226 4 64.8226 4C64.8226 4 97 4 97 4C97 4 97 36.1774 97 36.1774C97 36.1774 65.5887 36.1774 65.5887 36.1774C65.5887 36.1774 65.5887 66.8226 65.5887 66.8226C65.5887 66.8226 97 66.8226 97 66.8226C97 66.8226 97 99 97 99C97 99 64.8226 99 64.8226 99C64.8226 99 64.8226 67.5887 64.8226 67.5887C64.8226 67.5887 34.1774 67.5887 34.1774 67.5887C34.1774 67.5887 34.1774 99 34.1774 99C34.1774 99 2 99 2 99C2 99 2 66.8226 2 66.8226C2 66.8226 33.4113 66.8226 33.4113 66.8226C33.4113 66.8226 33.4113 36.1774 33.4113 36.1774C33.4113 36.1774 2 36.1774 2 36.1774C2 36.1774 2 4 2 4Z";
-const resultPath = subdivideCubicSvgPath(inputPath, 8);
-console.log(resultPath);
+// const resultPath = subdivideCubicSvgPath(inputPath, 8);
+// console.log(resultPath);
+
+function calculateFlatPolygonArea(flatArray) {
+  let shoelaceSum = 0;
+  const numPoints = flatArray.length / 2;
+
+  for (let i = 0; i < numPoints - 1; i++) {
+    const x0 = flatArray[i * 2];
+    const y0 = flatArray[i * 2 + 1];
+    const x1 = flatArray[(i + 1) * 2];
+    const y1 = flatArray[(i + 1) * 2 + 1];
+
+    shoelaceSum += x0 * y1 - x1 * y0;
+  }
+
+  return shoelaceSum / 2;
+}
+
+function getFlatArrayCentroid(flatArray) {
+  let shoelaceSum = 0;
+  let cxSum = 0;
+  let cySum = 0;
+  const numPoints = flatArray.length / 2;
+
+  for (let i = 0; i < numPoints - 1; i++) {
+    const x0 = flatArray[i * 2];
+    const y0 = flatArray[i * 2 + 1];
+    const x1 = flatArray[(i + 1) * 2];
+    const y1 = flatArray[(i + 1) * 2 + 1];
+
+    const crossProduct = x0 * y1 - x1 * y0;
+    shoelaceSum += crossProduct;
+    cxSum += (x0 + x1) * crossProduct;
+    cySum += (y0 + y1) * crossProduct;
+  }
+
+  const area = shoelaceSum / 2;
+  return {
+    closestX: Number((cxSum / (6 * area)).toFixed(2)),
+    closestY: Number((cySum / (6 * area)).toFixed(2)),
+  };
+}
+
+// const coords = [53.2635, 68.6401, 59.776, 64.496, /* ... rest of array */];
+
+// Output: { closestX: 52.03, closestY: 49.96 }
+
+const coords = [
+  53.2635, 68.6401, 59.776, 64.496, 66.1405, 59.7599, 71.3949, 54.5058, 89.3043,
+  36.5975, 91.3025, 20.8353, 89.4523, 15.2112, 92.1166, 12.5471, 94.7808,
+  9.8831, 97.445, 7.21906, 98.185, 6.47904, 98.185, 5.29502, 97.445, 4.55501,
+  96.7049, 3.815, 95.5208, 3.815, 94.7807, 4.55501, 92.1165, 7.21905, 89.4523,
+  9.8831, 86.7881, 12.5471, 81.1637, 10.6971, 65.4005, 12.6951, 47.4911,
+  30.6034, 42.2366, 35.8575, 37.5003, 42.2216, 33.356, 48.7337, 27.3615,
+  47.2537, 16.9267, 47.2537, 9.6741, 55.3198, 1.38545, 64.422, 6.26983, 73.0801,
+  8.11997, 71.3041, 9.60009, 69.7501, 12.1163, 60.6479, 23.0691, 67.678, 21.293,
+  71.3781, 21.367, 73.6721, 22.5511, 74.7821, 24.1052, 76.3362, 25.6593,
+  77.8902, 27.2135, 79.4442, 28.3976, 80.6282, 30.6177, 80.7762, 34.392,
+  78.9262, 41.3486, 89.8784, 32.2459, 92.3944, 30.7657, 93.9484, 28.9156,
+  95.7245, 37.5743, 100.609, 46.677, 92.3204, 54.7436, 85.0683, 54.7436,
+  74.6341, 53.2635, 68.6401,
+];
+console.log(getFlatArrayCentroid(coords));
+// console.log(calculateFlatPolygonArea(coords));
