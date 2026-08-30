@@ -5,7 +5,7 @@ gsap.registerPlugin(MorphSVGPlugin);
 
 let tl = gsap
   .timeline({
-    defaults: { duration: 3, ease: "expo.inOut" },
+    defaults: { duration: 1.5, ease: "expo.inOut" },
     // repeat: -1,
   })
   .to("#morph", { morphSVG: "#speech" })
