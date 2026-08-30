@@ -8,6 +8,7 @@
  */
 /* eslint-disable */
 
+import { getClosestAnchor, subdividePath } from "./subDivide.js";
 import {
   getRawPath,
   reverseSegment,
@@ -410,11 +411,18 @@ let gsap,
         );
       }
       i = shorter.length;
+      const cloneShort = [...shorter];
       while (added < dif) {
-        x = longer[i].size || _getSize(longer[i]); //just to ensure centerX and centerY are calculated which we use on the next line.
-        b = _getClosestAnchor(shorter, longer[i].centerX, longer[i].centerY);
-        x = b[0];
-        y = b[1];
+        // x = longer[i].size || _getSize(longer[i]); //just to ensure centerX and centerY are calculated which we use on the next line.
+        // b = _getClosestAnchor(cloneShort, longer[i].centerX, longer[i].centerY);
+        // x = b[0];
+        // y = b[1];
+        const point = getClosestAnchor(
+          { x: longer[i].centerX, y: longer[i].centerY },
+          cloneShort,
+        );
+        x = point.x;
+        y = point.y;
         shorter[i++] = [x, y, x, y, x, y, x, y];
         shorter.totalPoints += 8;
         added++;
@@ -426,9 +434,16 @@ let gsap,
       sb = start[i];
       dif = eb.length - sb.length;
       if (dif < 0) {
-        _subdivideSegmentQty(eb, (-dif / 6) | 0);
+        const curveToAdd = (sb.length - 2) / 6;
+        eb = subdividePath(eb, curveToAdd);
+        end[i] = eb;
+        // _subdivideSegmentQty(eb, (-dif / 6) | 0);
       } else if (dif > 0) {
-        _subdivideSegmentQty(sb, (dif / 6) | 0);
+        const curveToAdd = (eb.length - 2) / 6;
+        sb = subdividePath(sb, curveToAdd);
+        start[i] = sb;
+        // _subdivideSegmentQty(sb, (dif / 6) | 0);
+        console.log("sb ", sb);
       }
       if (reverse && fillSafe !== false && !sb.reversed) {
         reverseSegment(sb);

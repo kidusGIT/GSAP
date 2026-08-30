@@ -12,7 +12,7 @@ const seek = document.getElementById("btn-seek");
 
 let t;
 t = gsap.to("#lightning", {
-  morphSVG: "#rocket",
+  morphSVG: "#triangle",
   duration: 1.5,
 });
 
