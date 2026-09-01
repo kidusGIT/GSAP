@@ -11,8 +11,8 @@ const resume = document.getElementById("btn-resume");
 const seek = document.getElementById("btn-seek");
 
 let t;
-t = gsap.to("#lightning", {
-  morphSVG: "#triangle",
+t = gsap.to("#triangle", {
+  morphSVG: "#rocket",
   duration: 1.5,
 });
 
