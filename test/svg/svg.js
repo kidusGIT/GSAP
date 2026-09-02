@@ -263,7 +263,7 @@ function subdivideCubicSvgPath(dPath, targetSegments, precision = 4) {
 
 // Example Execution:
 const inputPath =
-  "M2 4C2 4 34.1774 4 34.1774 4C34.1774 4 34.1774 35.4113 34.1774 35.4113C34.1774 35.4113 64.8226 35.4113 64.8226 35.4113C64.8226 35.4113 64.8226 4 64.8226 4C64.8226 4 97 4 97 4C97 4 97 36.1774 97 36.1774C97 36.1774 65.5887 36.1774 65.5887 36.1774C65.5887 36.1774 65.5887 66.8226 65.5887 66.8226C65.5887 66.8226 97 66.8226 97 66.8226C97 66.8226 97 99 97 99C97 99 64.8226 99 64.8226 99C64.8226 99 64.8226 67.5887 64.8226 67.5887C64.8226 67.5887 34.1774 67.5887 34.1774 67.5887C34.1774 67.5887 34.1774 99 34.1774 99C34.1774 99 2 99 2 99C2 99 2 66.8226 2 66.8226C2 66.8226 33.4113 66.8226 33.4113 66.8226C33.4113 66.8226 33.4113 36.1774 33.4113 36.1774C33.4113 36.1774 2 36.1774 2 36.1774C2 36.1774 2 4 2 4Z";
+  "M 2,4 C 2,4 34.1774,4 34.1774,4 C 34.1774,4 34.1774,35.4113 34.1774,35.4113  34.1774,35.4113 64.8226,35.4113 64.8226,35.4113 C 64.8226,35.4113 64.8226,4 64.8226,4 C 64.8226,4 97,4 97,4 C 97,4 97,36.1774 97,36.1774 C 97,36.1774 65.5887,36.1774 65.5887,36.1774 C 65.5887,36.1774 65.5887,66.8226 65.5887,66.8226 C 65.5887,66.8226 97,66.8226 97,66.8226 C 97,66.8226 97,99 97,99 C 97,99 64.8226,99 64.8226,99 C 64.8226,99 64.8226,67.5887 64.8226,67.5887 C 64.8226,67.5887 34.1774,67.5887 34.1774,67.5887 C 34.1774,67.5887 34.1774,99 34.1774,99 C 34.1774,99 2,99 2,99 C 2,99 2,66.8226 2,66.8226 C 2,66.8226 33.4113,66.8226 33.4113,66.8226 C 33.4113,66.8226 33.4113,36.1774 33.4113,36.1774 C 33.4113,36.1774 2,36.1774 2,36.1774 C 2,36.1774 2,4 2,4 Z";
 // const resultPath = subdivideCubicSvgPath(inputPath, 8);
 // console.log(resultPath);
 
@@ -327,5 +327,99 @@ const coords = [
   95.7245, 37.5743, 100.609, 46.677, 92.3204, 54.7436, 85.0683, 54.7436,
   74.6341, 53.2635, 68.6401,
 ];
-console.log(getFlatArrayCentroid(coords));
+// console.log(getFlatArrayCentroid(coords));
 // console.log(calculateFlatPolygonArea(coords));
+
+/**
+ * Auto-detecting function to reverse flat cubic Bézier arrays.
+ * Returns a flat array of numbers matching the input stride structure.
+ *
+ * @param {number[]} coords - Flat array of coordinate numbers.
+ * @returns {number[]} Reversed flat array of numbers.
+ */
+function reverseFlatCubicSegmentsToArray(coords) {
+  if (!Array.isArray(coords) || coords.length < 8) {
+    return [];
+  }
+
+  function cleanNum(n) {
+    return Math.round(n * 10000) / 10000;
+  }
+
+  const len = coords.length;
+
+  // Auto-detect stride format
+  let stride = 8;
+  if (len % 8 !== 0) {
+    if ((len - 2) % 6 === 0) {
+      stride = 6;
+    } else {
+      console.warn(
+        `[SVG Reverser]: Invalid array length ${len}. Must be a multiple of 8, or 2 + multiple of 6.`,
+      );
+      return [];
+    }
+  }
+
+  const output = new Array(len);
+
+  // Stride 8: [startX, startY, cp1X, cp1Y, cp2X, cp2Y, endX, endY]
+  if (stride === 8) {
+    let writeIdx = 0;
+    for (let i = len - 8; i >= 0; i -= 8) {
+      output[writeIdx++] = cleanNum(coords[i + 6]); // New startX = Old endX
+      output[writeIdx++] = cleanNum(coords[i + 7]); // New startY = Old endY
+      output[writeIdx++] = cleanNum(coords[i + 4]); // New cp1X   = Old cp2X
+      output[writeIdx++] = cleanNum(coords[i + 5]); // New cp1Y   = Old cp2Y
+      output[writeIdx++] = cleanNum(coords[i + 2]); // New cp2X   = Old cp1X
+      output[writeIdx++] = cleanNum(coords[i + 3]); // New cp2Y   = Old cp1Y
+      output[writeIdx++] = cleanNum(coords[i]); // New endX   = Old startX
+      output[writeIdx++] = cleanNum(coords[i + 1]); // New endY   = Old startY
+    }
+  }
+
+  // Stride 6: [startX, startY,  cp1X, cp1Y, cp2X, cp2Y, endX, endY, ...]
+  else if (stride === 6) {
+    // Initial start point of the reversed path is the end point of the last original segment
+    output[0] = cleanNum(coords[len - 2]);
+    output[1] = cleanNum(coords[len - 1]);
+
+    let writeIdx = 2;
+    for (let i = len - 6; i >= 2; i -= 6) {
+      const prevX = i === 2 ? coords[0] : coords[i - 2];
+      const prevY = i === 2 ? coords[1] : coords[i - 1];
+
+      output[writeIdx++] = cleanNum(coords[i + 2]); // New cp1X = Old cp2X
+      output[writeIdx++] = cleanNum(coords[i + 3]); // New cp1Y = Old cp2Y
+      output[writeIdx++] = cleanNum(coords[i]); // New cp2X = Old cp1X
+      output[writeIdx++] = cleanNum(coords[i + 1]); // New cp2Y = Old cp1Y
+      output[writeIdx++] = cleanNum(prevX); // New endX = Old startX
+      output[writeIdx++] = cleanNum(prevY); // New endY = Old startY
+    }
+  }
+
+  return output;
+}
+
+// function cleanNum(n) {
+//   return Math.round(n * 10000) / 10000;
+// }
+
+let segments = [
+  64.73, 37.39, 62.24, 34.9, 62.24, 30.75, 64.73, 28.25, 67.3, 25.69, 71.38,
+  25.69, 73.88, 28.25, 76.44, 30.81, 76.44, 34.83, 73.88, 37.39, 71.38, 39.89,
+  67.3, 39.89, 64.73, 37.39,
+];
+
+segments = [
+  64.5864, 37.4115, 61.9222, 34.7475, 61.9222, 30.3074, 64.5864, 27.6434,
+  67.3246, 24.9053, 71.6909, 24.9053, 74.3552, 27.6434, 77.0934, 30.3814,
+  77.0934, 34.6735, 74.3552, 37.4115, 71.6909, 40.0756, 67.3246, 40.0756,
+  64.5864, 37.4115,
+];
+
+const r = reverseFlatCubicSegmentsToArray(segments, true);
+
+console.log("r ", r);
+
+// M 64.5864, 37.4115 C 67.3246, 40.0756, 71.6909, 40.0756 74.3552, 37.4115 C 77.0934, 34.6735, 77.0934, 30.3814, 74.3552, 27.6434 C 71.6909, 24.9053, 67.3246, 24.9053, 64.5864, 27.6434 C 61.9222, 30.3074, 61.9222, 34.7475, 64.5864, 37.4115

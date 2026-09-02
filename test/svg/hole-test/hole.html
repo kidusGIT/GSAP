@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GSAP SVG</title>
+
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        /* background: #0e100f; */
+        overflow: hidden;
+      }
+
+      .btn {
+        padding: 10px;
+        padding-left: 15px;
+        padding-right: 15px;
+        background-color: rgb(25, 92, 179);
+        color: white;
+        border: none;
+        outline: none;
+        border-radius: 7px;
+        cursor: pointer;
+      }
+
+      .btn-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .container {
+        position: relative;
+        width: 90vw;
+        height: 90vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-evenly;
+        border-radius: 9px;
+      }
+
+      #svg-stage {
+        width: 60%;
+        max-height: 60vh;
+        max-width: 500px;
+        overflow: visible;
+      }
+
+      #gradient {
+        height: 0;
+      }
+    </style>
+
+    <script src="./hole.js" type="module" defer></script>
+  </head>
+  <body>
+    <div class="btn-wrapper">
+      <!-- <button class="btn" id="btn-start">Start</button> -->
+      <button class="btn" id="btn-play">Play</button>
+      <button class="btn" id="btn-reverse">Reverse</button>
+      <button class="btn" id="btn-pause">Pause</button>
+      <button class="btn" id="btn-resume">Resume</button>
+      <button class="btn" id="btn-seek">Seek</button>
+    </div>
+    <div class="container">
+      <svg viewBox="0 0 200 200" width="200" height="200">
+        <!-- Both Outer & Inner Rectangles are Clockwise using C commands -->
+        <path
+          id="fill"
+          fill-rule="nonzero"
+          fill="transparent"
+          d="
+    M 20 20
+    C 20 20, 180 20, 180 20
+    C 180 20, 180 180, 180 180
+    C 180 180, 20 180, 20 180
+    Z
+    M 60 60
+    C 60 60, 140 60, 140 60
+    C 140 60, 140 140, 140 140
+    C 140 140, 60 140, 60 140
+    Z"
+        />
+        <!-- <path id="triangle" d="M 50,15 L 90,85 L 10,85 Z" fill="#1c7db6" /> -->
+
+        <path
+          id="lightning"
+          d="M47.1,0.8 73.3,0.8 61.9,37.2 77.1,37.2 30.7,99.4 45.8,51.9 29,51.9z"
+          fill="transparent"
+        />
+
+        <path
+          id="hole"
+          fill-rule="nonzero"
+          fill="#1c7db6"
+          d="M 20 20
+    C 20 20, 180 20, 180 20
+    C 180 20, 180 180, 180 180
+    C 180 180, 20 180, 20 180
+    Z
+    M 60 60
+    C 60 60, 60 140, 60 140
+    C 60 140, 140 140, 140 140
+    C 140 140, 140 60, 140 60
+    Z"
+        />
+      </svg>
+    </div>
+  </body>
+</html>

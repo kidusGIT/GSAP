@@ -273,3 +273,67 @@ export function getClosestAnchor(point, paths) {
 
   return closest;
 }
+
+export function reverseSegmentToArray(coords) {
+  if (!Array.isArray(coords) || coords.length < 8) {
+    return [];
+  }
+
+  function cleanNum(n) {
+    return Math.round(n * 10000) / 10000;
+  }
+
+  const len = coords.length;
+
+  // Auto-detect stride format
+  let stride = 8;
+  if (len % 8 !== 0) {
+    if ((len - 2) % 6 === 0) {
+      stride = 6;
+    } else {
+      console.warn(
+        `[SVG Reverser]: Invalid array length ${len}. Must be a multiple of 8, or 2 + multiple of 6.`,
+      );
+      return [];
+    }
+  }
+
+  const output = new Array(len);
+
+  // Stride 8: [startX, startY, cp1X, cp1Y, cp2X, cp2Y, endX, endY]
+  if (stride === 8) {
+    let writeIdx = 0;
+    for (let i = len - 8; i >= 0; i -= 8) {
+      output[writeIdx++] = cleanNum(coords[i + 6]); // New startX = Old endX
+      output[writeIdx++] = cleanNum(coords[i + 7]); // New startY = Old endY
+      output[writeIdx++] = cleanNum(coords[i + 4]); // New cp1X   = Old cp2X
+      output[writeIdx++] = cleanNum(coords[i + 5]); // New cp1Y   = Old cp2Y
+      output[writeIdx++] = cleanNum(coords[i + 2]); // New cp2X   = Old cp1X
+      output[writeIdx++] = cleanNum(coords[i + 3]); // New cp2Y   = Old cp1Y
+      output[writeIdx++] = cleanNum(coords[i]); // New endX   = Old startX
+      output[writeIdx++] = cleanNum(coords[i + 1]); // New endY   = Old startY
+    }
+  }
+
+  // Stride 6: [startX, startY,  cp1X, cp1Y, cp2X, cp2Y, endX, endY, ...]
+  else if (stride === 6) {
+    // Initial start point of the reversed path is the end point of the last original segment
+    output[0] = cleanNum(coords[len - 2]);
+    output[1] = cleanNum(coords[len - 1]);
+
+    let writeIdx = 2;
+    for (let i = len - 6; i >= 2; i -= 6) {
+      const prevX = i === 2 ? coords[0] : coords[i - 2];
+      const prevY = i === 2 ? coords[1] : coords[i - 1];
+
+      output[writeIdx++] = cleanNum(coords[i + 2]); // New cp1X = Old cp2X
+      output[writeIdx++] = cleanNum(coords[i + 3]); // New cp1Y = Old cp2Y
+      output[writeIdx++] = cleanNum(coords[i]); // New cp2X = Old cp1X
+      output[writeIdx++] = cleanNum(coords[i + 1]); // New cp2Y = Old cp1Y
+      output[writeIdx++] = cleanNum(prevX); // New endX = Old startX
+      output[writeIdx++] = cleanNum(prevY); // New endY = Old startY
+    }
+  }
+
+  return output;
+}

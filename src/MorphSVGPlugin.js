@@ -8,7 +8,11 @@
  */
 /* eslint-disable */
 
-import { getClosestAnchor, subdividePath } from "./subDivide.js";
+import {
+  getClosestAnchor,
+  reverseSegmentToArray,
+  subdividePath,
+} from "./subDivide.js";
 import {
   getRawPath,
   reverseSegment,
@@ -446,7 +450,8 @@ let gsap,
         console.log("sb ", sb);
       }
       if (reverse && fillSafe !== false && !sb.reversed) {
-        reverseSegment(sb);
+        // reverseSegment(sb);
+        // start[i] = reverseSegmentToArray(sb);
       }
       shapeIndex =
         shapeIndices[i] || shapeIndices[i] === 0 ? shapeIndices[i] : "auto";
