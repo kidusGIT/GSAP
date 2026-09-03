@@ -72,47 +72,20 @@
       <button class="btn" id="btn-seek">Seek</button>
     </div>
     <div class="container">
-      <svg viewBox="0 0 200 200" width="200" height="200">
-        <!-- Both Outer & Inner Rectangles are Clockwise using C commands -->
-        <path
-          id="fill"
-          fill-rule="nonzero"
-          fill="transparent"
-          d="
-    M 20 20
-    C 20 20, 180 20, 180 20
-    C 180 20, 180 180, 180 180
-    C 180 180, 20 180, 20 180
-    Z
-    M 60 60
-    C 60 60, 140 60, 140 60
-    C 140 60, 140 140, 140 140
-    C 140 140, 60 140, 60 140
-    Z"
-        />
-        <!-- <path id="triangle" d="M 50,15 L 90,85 L 10,85 Z" fill="#1c7db6" /> -->
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="400"
+        height="400"
+        viewBox="0 0 124 124"
+        fill=""
+      >
+        <!-- Shape A: Diamond -->
+        <!-- Point order: Top (P0), Right (P1), Bottom (P2), Left (P3) -->
+        <path id="diamond" d="M 50 10 L 90 50 L 50 90 L 10 50 Z" />
 
-        <path
-          id="lightning"
-          d="M47.1,0.8 73.3,0.8 61.9,37.2 77.1,37.2 30.7,99.4 45.8,51.9 29,51.9z"
-          fill="transparent"
-        />
-
-        <path
-          id="hole"
-          fill-rule="nonzero"
-          fill="#1c7db6"
-          d="M 20 20
-    C 20 20, 180 20, 180 20
-    C 180 20, 180 180, 180 180
-    C 180 180, 20 180, 20 180
-    Z
-    M 60 60
-    C 60 60, 60 140, 60 140
-    C 60 140, 140 140, 140 140
-    C 140 140, 140 60, 140 60
-    Z"
-        />
+        <!-- Shape B: Square -->
+        <!-- Point order: Bottom-Right (P0), Bottom-Left (P1), Top-Left (P2), Top-Right (P3) -->
+        <path id="square" fill="none" d="M 80 80 L 20 80 L 20 20 L 80 20 Z" />
       </svg>
     </div>
   </body>

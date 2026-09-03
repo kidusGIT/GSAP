@@ -423,3 +423,36 @@ const r = reverseFlatCubicSegmentsToArray(segments, true);
 console.log("r ", r);
 
 // M 64.5864, 37.4115 C 67.3246, 40.0756, 71.6909, 40.0756 74.3552, 37.4115 C 77.0934, 34.6735, 77.0934, 30.3814, 74.3552, 27.6434 C 71.6909, 24.9053, 67.3246, 24.9053, 64.5864, 27.6434 C 61.9222, 30.3074, 61.9222, 34.7475, 64.5864, 37.4115
+
+// Calculates the angle of a point relative to a centroid
+function getAngleFromCentroid(point, centroid) {
+  const dx = point.x - centroid.x;
+  const dy = point.y - centroid.y;
+  return Math.atan2(dy, dx); // Returns angle in radians (-PI to PI)
+}
+
+// Finds the optimal starting index for Shape B to match Shape A
+function alignShapeRotation(shapeA, shapeB, centroidA, centroidB) {
+  // 1. Get the angle of Shape A's first point relative to its center
+  const targetAngle = getAngleFromCentroid(shapeA[0], centroidA);
+
+  let bestIndex = 0;
+  let smallestDiff = Infinity;
+
+  // 2. Loop through all points in Shape B to find the closest angle match
+  for (let i = 0; i < shapeB.length; i++) {
+    const angleB = getAngleFromCentroid(shapeB[i], centroidB);
+
+    // Normalize angle difference to [0, PI]
+    let diff = Math.abs(targetAngle - angleB);
+    if (diff > Math.PI) diff = 2 * Math.PI - diff;
+
+    if (diff < smallestDiff) {
+      smallestDiff = diff;
+      bestIndex = i;
+    }
+  }
+
+  // 3. Shift/Rotate Array B so bestIndex becomes index 0
+  return [...shapeB.slice(bestIndex), ...shapeB.slice(0, bestIndex)];
+}

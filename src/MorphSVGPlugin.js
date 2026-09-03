@@ -173,6 +173,7 @@ let gsap,
     }
   },
   _getTotalMovement = (sb, eb, shapeIndex, offsetX, offsetY) => {
+    //
     let l = sb.length,
       d = 0,
       wrap = l - 2,

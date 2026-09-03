@@ -2964,6 +2964,7 @@ let _addComplexStringPropTween = function (
         }
       }
     }
+
     if (!optional || parsedStart !== end || _forceAllPropTweens) {
       if (!isNaN(parsedStart * end) && end !== "") {
         // fun fact: any number multiplied by "" is evaluated as the number 0!
