@@ -337,3 +337,84 @@ export function reverseSegmentToArray(coords) {
 
   return output;
 }
+
+function getCentroid(flatCoords) {
+  let sumX = 0;
+  let sumY = 0;
+  const totalCoords = flatCoords.length;
+
+  for (let i = 0; i < totalCoords; i += 2) {
+    sumX += flatCoords[i];
+    sumY += flatCoords[i + 1];
+  }
+
+  const pointCount = totalCoords / 2;
+
+  return {
+    x: sumX / pointCount,
+    y: sumY / pointCount,
+  };
+}
+
+export function matchByPolarAngle(source, target) {
+  const sourceLen = source.length;
+  const targetLen = target.length;
+
+  // SVG paths must have matching point counts for morphing
+  if (sourceLen !== targetLen) {
+    throw new Error(
+      "Source and target point arrays must have the same length.",
+    );
+  }
+
+  const centerA = getCentroid(source);
+  const centerB = getCentroid(target);
+
+  const numPoints = sourceLen / 2;
+  const sourceAngles = new Float64Array(numPoints);
+  const targetAngles = new Float64Array(numPoints);
+
+  // 1. Calculate polar angles for both shapes relative to their centroids
+  for (let i = 0; i < numPoints; i++) {
+    const sX = source[i * 2] - centerA.x;
+    const sY = source[i * 2 + 1] - centerA.y;
+    sourceAngles[i] = Math.atan2(sY, sX);
+
+    const tX = target[i * 2] - centerB.x;
+    const tY = target[i * 2 + 1] - centerB.y;
+    targetAngles[i] = Math.atan2(tY, tX);
+  }
+
+  // 2. Find the global index shift offset that minimizes total angular difference
+  let bestShift = 0;
+  let minTotalDiff = Infinity;
+
+  for (let shift = 0; shift < numPoints; shift++) {
+    let currentDiff = 0;
+
+    for (let i = 0; i < numPoints; i++) {
+      const targetIdx = (i + shift) % numPoints;
+
+      let diff = Math.abs(sourceAngles[i] - targetAngles[targetIdx]);
+      if (diff > Math.PI) diff = 2 * Math.PI - diff;
+
+      currentDiff += diff;
+    }
+
+    if (currentDiff < minTotalDiff) {
+      minTotalDiff = currentDiff;
+      bestShift = shift;
+    }
+  }
+
+  // 3. Re-order target points preserves topology and fixes rotational alignment
+  const result = new Array(sourceLen);
+
+  for (let i = 0; i < numPoints; i++) {
+    const targetIdx = (i + bestShift) % numPoints;
+    result[i * 2] = target[targetIdx * 2];
+    result[i * 2 + 1] = target[targetIdx * 2 + 1];
+  }
+
+  return result;
+}

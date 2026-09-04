@@ -10,6 +10,7 @@
 
 import {
   getClosestAnchor,
+  matchByPolarAngle,
   reverseSegmentToArray,
   subdividePath,
 } from "./subDivide.js";
@@ -451,9 +452,12 @@ let gsap,
         console.log("sb ", sb);
       }
       if (reverse && fillSafe !== false && !sb.reversed) {
-        // reverseSegment(sb);
+        reverseSegment(sb);
         // start[i] = reverseSegmentToArray(sb);
       }
+
+      matchByPolarAngle(sb, eb);
+
       shapeIndex =
         shapeIndices[i] || shapeIndices[i] === 0 ? shapeIndices[i] : "auto";
       if (shapeIndex) {
@@ -1049,6 +1053,7 @@ export const MorphSVGPlugin = {
       pt.r(ratio, pt.d);
       pt = pt._next;
     }
+
     if (ratio === 1 && data._apply) {
       pt = data._pt;
       while (pt) {
