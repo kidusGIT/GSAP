@@ -1,111 +1,195 @@
-/**
- * Aligns target Bézier curve array to match source orientation and segment order
- * for smooth SVG morphing without twisting or structure breakdown.
- *
- * @param {number[]} source - Flat array of coordinates [x0, y0, x1, y1, ...]
- * @param {number[]} target - Flat array of coordinates [x0, y0, x1, y1, ...]
- * @returns {number[]} Optimal aligned target array
- */
-function alignBezierCurvesForMorphing(source, target) {
-  const len = source.length;
-  if (len !== target.length) {
-    throw new Error("Source and target arrays must be the same length.");
+function pairPoints(arr) {
+  const pairs = [];
+  for (let i = 0; i < arr.length; i += 2) {
+    pairs.push({ x: arr[i], y: arr[i + 1] });
   }
-
-  const numPoints = len / 2;
-  // Cubic Bézier curves repeat every 3 points (Control 1, Control 2, Anchor)
-  const segmentStride = 3;
-  const numSegments = (numPoints - 1) / segmentStride;
-
-  if (!Number.isInteger(numSegments)) {
-    console.warn(
-      "Array point count does not align cleanly to cubic Bézier segments. Falling back to point-stride.",
-    );
-  }
-
-  const stride = Number.isInteger(numSegments) ? segmentStride : 1;
-  const totalSteps = numPoints / stride;
-
-  let bestAlignedTarget = null;
-  let minTotalDistanceSq = Infinity;
-
-  // Test 1: Forward Alignment across valid Bézier segment shifts
-  for (let step = 0; step < totalSteps; step++) {
-    const shiftPoints = step * stride;
-    const shiftCoords = shiftPoints * 2;
-
-    let currentDistSq = 0;
-    for (let i = 0; i < len; i += 2) {
-      const targetIdx = (i + shiftCoords) % len;
-      const dx = source[i] - target[targetIdx];
-      const dy = source[i + 1] - target[targetIdx + 1];
-      currentDistSq += dx * dx + dy * dy;
-    }
-
-    if (currentDistSq < minTotalDistanceSq) {
-      minTotalDistanceSq = currentDistSq;
-      bestAlignedTarget = reorderArray(target, shiftCoords, false);
-    }
-  }
-
-  // Test 2: Reverse Winding Order Alignment (handles opposite drawing directions)
-  const reversedTarget = reverseBezierPath(target);
-
-  for (let step = 0; step < totalSteps; step++) {
-    const shiftPoints = step * stride;
-    const shiftCoords = shiftPoints * 2;
-
-    let currentDistSq = 0;
-    for (let i = 0; i < len; i += 2) {
-      const targetIdx = (i + shiftCoords) % len;
-      const dx = source[i] - reversedTarget[targetIdx];
-      const dy = source[i + 1] - reversedTarget[targetIdx + 1];
-      currentDistSq += dx * dx + dy * dy;
-    }
-
-    if (currentDistSq < minTotalDistanceSq) {
-      minTotalDistanceSq = currentDistSq;
-      bestAlignedTarget = reorderArray(reversedTarget, shiftCoords, false);
-    }
-  }
-
-  return bestAlignedTarget;
+  return pairs;
 }
 
-// Helper: Cyclically offset array coordinates
-function reorderArray(arr, shiftCoords) {
-  const len = arr.length;
-  const result = new Array(len);
-  for (let i = 0; i < len; i += 2) {
-    const sourceIdx = (i + shiftCoords) % len;
-    result[i] = arr[sourceIdx];
-    result[i + 1] = arr[sourceIdx + 1];
+function reverseCurve(coords) {
+  if (!Array.isArray(coords) || coords.length < 8) {
+    return [];
   }
+
+  function cleanNum(n) {
+    return Math.round(n * 10000) / 10000;
+  }
+
+  const len = coords.length;
+
+  // Auto-detect stride format
+  let stride = 8;
+  if (len % 8 !== 0) {
+    if ((len - 2) % 6 === 0) {
+      stride = 6;
+    } else {
+      console.warn(
+        `[SVG Reverser]: Invalid array length ${len}. Must be a multiple of 8, or 2 + multiple of 6.`,
+      );
+      return [];
+    }
+  }
+
+  const output = new Array(len);
+
+  // Stride 8: [startX, startY, cp1X, cp1Y, cp2X, cp2Y, endX, endY]
+  if (stride === 8) {
+    let writeIdx = 0;
+    for (let i = len - 8; i >= 0; i -= 8) {
+      output[writeIdx++] = cleanNum(coords[i + 6]); // New startX = Old endX
+      output[writeIdx++] = cleanNum(coords[i + 7]); // New startY = Old endY
+      output[writeIdx++] = cleanNum(coords[i + 4]); // New cp1X   = Old cp2X
+      output[writeIdx++] = cleanNum(coords[i + 5]); // New cp1Y   = Old cp2Y
+      output[writeIdx++] = cleanNum(coords[i + 2]); // New cp2X   = Old cp1X
+      output[writeIdx++] = cleanNum(coords[i + 3]); // New cp2Y   = Old cp1Y
+      output[writeIdx++] = cleanNum(coords[i]); // New endX   = Old startX
+      output[writeIdx++] = cleanNum(coords[i + 1]); // New endY   = Old startY
+    }
+  }
+
+  // Stride 6: [startX, startY,  cp1X, cp1Y, cp2X, cp2Y, endX, endY, ...]
+  else if (stride === 6) {
+    // Initial start point of the reversed path is the end point of the last original segment
+    output[0] = cleanNum(coords[len - 2]);
+    output[1] = cleanNum(coords[len - 1]);
+
+    let writeIdx = 2;
+    for (let i = len - 6; i >= 2; i -= 6) {
+      const prevX = i === 2 ? coords[0] : coords[i - 2];
+      const prevY = i === 2 ? coords[1] : coords[i - 1];
+
+      output[writeIdx++] = cleanNum(coords[i + 2]); // New cp1X = Old cp2X
+      output[writeIdx++] = cleanNum(coords[i + 3]); // New cp1Y = Old cp2Y
+      output[writeIdx++] = cleanNum(coords[i]); // New cp2X = Old cp1X
+      output[writeIdx++] = cleanNum(coords[i + 1]); // New cp2Y = Old cp1Y
+      output[writeIdx++] = cleanNum(prevX); // New endX = Old startX
+      output[writeIdx++] = cleanNum(prevY); // New endY = Old startY
+    }
+  }
+
+  return output;
+}
+
+function getCurveDirection(points) {
+  let area = 0;
+  for (let i = 0; i < points.length - 1; i++) {
+    area += points[i].x * points[i + 1].y;
+    area -= points[i + 1].x * points[i].y;
+  }
+  // Last point to first
+  area += points[points.length - 1].x * points[0].y;
+  area -= points[0].x * points[points.length - 1].y;
+
+  return area > 0 ? 1 : -1; // 1 = CCW, -1 = CW
+}
+
+function ensureSameDirection(source, target) {
+  const srcDir = getCurveDirection(pairPoints(source));
+  const tgtDir = getCurveDirection(pairPoints(target));
+
+  if (srcDir !== tgtDir) {
+    // Reverse target to match direction
+    return reverseCurve(target);
+  }
+  return target;
+}
+
+function findBestAlignment(source, target) {
+  let minDistance = Infinity;
+  let bestOffset = 0;
+  const sourcePoints = pairPoints(source);
+  const targetPoints = pairPoints(reverseCurve(target));
+
+  // Try all possible alignments
+  for (let offset = 0; offset < targetPoints.length; offset++) {
+    let totalDist = 0;
+    for (let i = 0; i < sourcePoints.length; i++) {
+      const srcIdx = i % sourcePoints.length;
+      const tgtIdx = (i + offset) % targetPoints.length;
+      const dx = sourcePoints[srcIdx].x - targetPoints[tgtIdx].x;
+      const dy = sourcePoints[srcIdx].y - targetPoints[tgtIdx].y;
+      totalDist += dx * dx + dy * dy;
+    }
+    if (totalDist < minDistance) {
+      minDistance = totalDist;
+      bestOffset = offset;
+    }
+  }
+  return bestOffset;
+}
+
+function centerCurve(curve) {
+  const points = pairPoints(curve);
+  let cx = 0,
+    cy = 0;
+
+  for (const p of points) {
+    cx += p.x;
+    cy += p.y;
+  }
+  cx /= points.length;
+  cy /= points.length;
+
+  const centered = [];
+  for (const p of points) {
+    centered.push(p.x - cx, p.y - cy);
+  }
+  return centered;
+}
+
+export function prepareForMorphing(source, target) {
+  // 1. Ensure same number of points
+  let src = source;
+  let tgt = target;
+
+  // 2. Match direction
+  tgt = ensureSameDirection(src, tgt);
+
+  // 3. Find best starting alignment
+  const offset = findBestAlignment(src, tgt);
+  tgt = rotatePoints(tgt, offset);
+
+  // 4. Center both curves
+  src = centerCurve(src);
+  tgt = centerCurve(tgt);
+
+  return { source: src, target: tgt };
+}
+
+function rotatePoints(curve, offset) {
+  const points = pairPoints(curve);
+  const rotated = [];
+  for (let i = 0; i < points.length; i++) {
+    const idx = (i + offset) % points.length;
+    rotated.push(points[idx].x, points[idx].y);
+  }
+  return rotated;
+}
+
+function easeInOut(t) {
+  return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+}
+
+function morphPoints(source, target, progress) {
+  const result = [];
+
+  // Ensure both arrays have same length
+  const count = Math.min(source.length, target.length);
+
+  for (let i = 0; i < count; i++) {
+    const srcVal = source[i];
+    const tgtVal = target[i];
+    // const easedProgress = easeInOut(progress);
+    result.push(srcVal + (tgtVal - srcVal) * progress);
+  }
+
   return result;
 }
 
-// Helper: Safely reverse Bézier path order while keeping control point pairs attached to their anchors
-function reverseBezierPath(arr) {
-  const len = arr.length;
-  const result = new Array(len);
-
-  // Copy start point from end of original array
-  result[0] = arr[len - 2];
-  result[1] = arr[len - 1];
-
-  let writeIdx = 2;
-  for (let i = len - 2; i > 0; i -= 6) {
-    // Reverse control points and anchors in groups of 3 points (6 coords)
-    result[writeIdx] = arr[i - 2]; // Control Point 2
-    result[writeIdx + 1] = arr[i - 1];
-    result[writeIdx + 2] = arr[i - 4]; // Control Point 1
-    result[writeIdx + 3] = arr[i - 3];
-    result[writeIdx + 4] = arr[i - 6]; // Next Anchor
-    result[writeIdx + 5] = arr[i - 5];
-    writeIdx += 6;
-  }
-
-  return result;
+// Usage
+export function animateMorph(sourceArray, targetArray, progress) {
+  const prepared = prepareForMorphing(sourceArray, targetArray);
+  return morphPoints(prepared.source, prepared.target, progress);
 }
 
 const source = [
@@ -147,9 +231,16 @@ const target = [
   47.1, 0.8,
 ];
 
-const alignedTarget = alignBezierCurvesForMorphing(source, target);
+// const bestOffset = findBestAlignment(source, target);
 
-console.log(alignedTarget);
+// console.log(
+//   "findBestAlignment: ",
+//   bestOffset,
+//   " info: ",
+//   source[bestOffset],
+//   " - ",
+//   target[bestOffset],
+// );
 
 // Now interpolate linearly between source and alignedTarget:
 // currentPoint = source[i] + (alignedTarget[i] - source[i]) * progress

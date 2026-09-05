@@ -8,12 +8,8 @@
  */
 /* eslint-disable */
 
-import {
-  getClosestAnchor,
-  matchByPolarAngle,
-  reverseSegmentToArray,
-  subdividePath,
-} from "./subDivide.js";
+import { getClosestAnchor, subdividePath } from "./subDivide.js";
+import { animateMorph, prepareForMorphing } from "./svgAlignment.js";
 import {
   getRawPath,
   reverseSegment,
@@ -354,7 +350,7 @@ let gsap,
     }
     return segment;
   },
-  _equalizeSegmentQuantity = (start, end, shapeIndex, map, fillSafe) => {
+  _equalizeSegmentQuantity = (start, end, shapeIndex, map, fillSafe, tween) => {
     //returns an array of shape indexes, 1 for each segment.
     let dif = end.length - start.length,
       longer = dif > 0 ? end : start,
@@ -379,6 +375,8 @@ let gsap,
     if (!shorter[0]) {
       return;
     }
+
+    const segments = [];
 
     if (longer.length > 1) {
       start.sort(sortMethod);
@@ -451,12 +449,13 @@ let gsap,
         // _subdivideSegmentQty(sb, (dif / 6) | 0);
         console.log("sb ", sb);
       }
+
+      segments.push({ start: [...sb], end: [...eb] });
+
       if (reverse && fillSafe !== false && !sb.reversed) {
         reverseSegment(sb);
         // start[i] = reverseSegmentToArray(sb);
       }
-
-      matchByPolarAngle(sb, eb);
 
       shapeIndex =
         shapeIndices[i] || shapeIndices[i] === 0 ? shapeIndices[i] : "auto";
@@ -516,6 +515,9 @@ let gsap,
     }
     log && _log("shapeIndex:[" + shapeIndices.join(",") + "]");
     start.shapeIndex = shapeIndices;
+    if (tween) {
+      tween._testSegs = segments;
+    }
     return shapeIndices;
   },
   _pathFilter = (a, shapeIndex, map, precompile, fillSafe) => {
@@ -875,7 +877,14 @@ export const MorphSVGPlugin = {
         end = stringToRawPath(precompiled ? value.precompile[1] : shape);
         if (
           !precompiled &&
-          !_equalizeSegmentQuantity(start, end, shapeIndex, map, fillSafe)
+          !_equalizeSegmentQuantity(
+            start,
+            end,
+            shapeIndex,
+            map,
+            fillSafe,
+            tween,
+          )
         ) {
           return false; //malformed path data or null target
         }
@@ -1049,10 +1058,22 @@ export const MorphSVGPlugin = {
       sin,
       cos,
       offset;
-    while (pt) {
-      pt.r(ratio, pt.d);
-      pt = pt._next;
+
+    const tween = data._tween;
+    const tweenSegments = tween._testSegs;
+    let path = [];
+
+    for (let k = 0; k < tweenSegments.length; k++) {
+      const { start, end } = tweenSegments[k];
+      path = path.concat(animateMorph(start, end, ratio));
     }
+
+    // rawPath = path;
+
+    // while (pt) {
+    //   pt.r(ratio, pt.d);
+    //   pt = pt._next;
+    // }
 
     if (ratio === 1 && data._apply) {
       pt = data._pt;
