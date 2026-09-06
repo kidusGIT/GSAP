@@ -254,3 +254,26 @@ function convertFlatArrayToSVGPath(flatArray) {
 
   return path;
 }
+
+function convertSVGPathToFlatArray(pathString) {
+  if (typeof pathString !== "string" || !pathString.trim()) {
+    return [];
+  }
+
+  // Extract all numbers (including decimals and negatives) from the string
+  const numberRegex = /-?\d+(?:\.\d+)?/g;
+  const matches = pathString.match(numberRegex);
+
+  if (!matches) return [];
+
+  // Convert string representations of numbers to float primitives
+  return matches.map(Number);
+}
+
+// Example usage:
+const svgPath =
+  "M 53.2635 68.6401 C 59.776 64.496 66.1405 59.7599 71.3949 54.5058 Z";
+const flatArray = convertSVGPathToFlatArray(svgPath);
+
+console.log(flatArray);
+// Output: [53.2635, 68.6401, 59.776, 64.496, 66.1405, 59.7599, 71.3949, 54.5058]
