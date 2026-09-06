@@ -231,16 +231,26 @@ const target = [
   47.1, 0.8,
 ];
 
-// const bestOffset = findBestAlignment(source, target);
+function convertFlatArrayToSVGPath(flatArray) {
+  if (!flatArray || flatArray.length < 2) return "";
 
-// console.log(
-//   "findBestAlignment: ",
-//   bestOffset,
-//   " info: ",
-//   source[bestOffset],
-//   " - ",
-//   target[bestOffset],
-// );
+  let path = `M ${flatArray[0]} ${flatArray[1]}`;
 
-// Now interpolate linearly between source and alignedTarget:
-// currentPoint = source[i] + (alignedTarget[i] - source[i]) * progress
+  for (let i = 2; i < flatArray.length; ) {
+    const px1 = flatArray[i++];
+    const py1 = flatArray[i++];
+
+    const px2 = flatArray[i++];
+    const py2 = flatArray[i++];
+
+    const px3 = flatArray[i++];
+    const py3 = flatArray[i++];
+
+    path += ` C ${px1} ${py1} ${px2} ${py2} ${px3} ${py3}`;
+  }
+
+  // 4. Close the path
+  path += " Z";
+
+  return path;
+}

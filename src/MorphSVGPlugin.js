@@ -1063,17 +1063,17 @@ export const MorphSVGPlugin = {
     const tweenSegments = tween._testSegs;
     let path = [];
 
-    for (let k = 0; k < tweenSegments.length; k++) {
-      const { start, end } = tweenSegments[k];
-      path = path.concat(animateMorph(start, end, ratio));
-    }
-
-    // rawPath = path;
-
-    // while (pt) {
-    //   pt.r(ratio, pt.d);
-    //   pt = pt._next;
+    // for (let k = 0; k < tweenSegments.length; k++) {
+    //   const { start, end } = tweenSegments[k];
+    //   path = path.concat(animateMorph(start, end, ratio));
     // }
+
+    // // rawPath = path;
+
+    while (pt) {
+      pt.r(ratio, pt.d);
+      pt = pt._next;
+    }
 
     if (ratio === 1 && data._apply) {
       pt = data._pt;
