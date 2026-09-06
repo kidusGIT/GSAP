@@ -149,9 +149,9 @@ export function prepareForMorphing(source, target) {
   const offset = findBestAlignment(src, tgt);
   tgt = rotatePoints(tgt, offset);
 
-  // 4. Center both curves
-  src = centerCurve(src);
-  tgt = centerCurve(tgt);
+  // // 4. Center both curves
+  // src = centerCurve(src);
+  // tgt = centerCurve(tgt);
 
   return { source: src, target: tgt };
 }
@@ -164,10 +164,6 @@ function rotatePoints(curve, offset) {
     rotated.push(points[idx].x, points[idx].y);
   }
   return rotated;
-}
-
-function easeInOut(t) {
-  return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
 }
 
 function morphPoints(source, target, progress) {
@@ -192,20 +188,49 @@ export function animateMorph(sourceArray, targetArray, progress) {
   return morphPoints(prepared.source, prepared.target, progress);
 }
 
+export function rearrangedArray(source = [], x) {
+  // 1. Ensure same number of points
+  let src = source;
+
+  const index = source.findIndex((v) => v === x);
+
+  if (index === -1) {
+    return [];
+  }
+
+  const offset = index;
+  src = reverseCurve(src);
+  src = reorderArray(src, offset);
+  // src = centerCurve(src);
+
+  return src;
+}
+
+function reorderArray(arr, shiftCoords) {
+  const len = arr.length;
+  const result = new Array(len);
+  for (let i = 0; i < len; i += 2) {
+    const srcIdx = (i + shiftCoords) % len;
+    result[i] = arr[srcIdx];
+    result[i + 1] = arr[srcIdx + 1];
+  }
+  return result;
+}
+
 const source = [
-  53.2635, 68.6401, 59.776, 64.496, 66.1405, 59.7599, 71.3949, 54.5058, 89.3043,
-  36.5975, 91.3025, 20.8353, 89.4523, 15.2112, 92.1166, 12.5471, 94.7808,
-  9.8831, 97.445, 7.21906, 98.185, 6.47904, 98.185, 5.29502, 97.445, 4.55501,
-  96.7049, 3.815, 95.5208, 3.815, 94.7807, 4.55501, 92.1165, 7.21905, 89.4523,
-  9.8831, 86.7881, 12.5471, 81.1637, 10.6971, 65.4005, 12.6951, 47.4911,
-  30.6034, 42.2366, 35.8575, 37.5003, 42.2216, 33.356, 48.7337, 27.3615,
-  47.2537, 16.9267, 47.2537, 9.6741, 55.3198, 1.38545, 64.422, 6.26983, 73.0801,
-  8.11997, 71.3041, 9.60009, 69.7501, 12.1163, 60.6479, 23.0691, 67.678, 21.293,
-  71.3781, 21.367, 73.6721, 22.5511, 74.7821, 24.1052, 76.3362, 25.6593,
-  77.8902, 27.2135, 79.4442, 28.3976, 80.6282, 30.6177, 80.7762, 34.392,
-  78.9262, 41.3486, 89.8784, 32.2459, 92.3944, 30.7657, 93.9484, 28.9156,
-  95.7245, 37.5743, 100.609, 46.677, 92.3204, 54.7436, 85.0683, 54.7436,
-  74.6341, 53.2635, 68.6401,
+  53.2635, 68.6401, 54.7436, 74.6341, 54.7436, 85.0683, 46.677, 92.3204,
+  37.5743, 100.609, 28.9156, 95.7245, 30.7657, 93.9484, 32.2459, 92.3944,
+  41.3486, 89.8784, 34.392, 78.9262, 30.6177, 80.7762, 28.3976, 80.6282,
+  27.2135, 79.4442, 25.6593, 77.8902, 24.1052, 76.3362, 22.5511, 74.7821,
+  21.367, 73.6721, 21.293, 71.3781, 23.0691, 67.678, 12.1163, 60.6479, 9.60009,
+  69.7501, 8.11997, 71.3041, 6.26983, 73.0801, 1.38545, 64.422, 9.6741, 55.3198,
+  16.9267, 47.2537, 27.3615, 47.2537, 33.356, 48.7337, 37.5003, 42.2216,
+  42.2366, 35.8575, 47.4911, 30.6034, 65.4005, 12.6951, 81.1637, 10.6971,
+  86.7881, 12.5471, 89.4523, 9.8831, 92.1165, 7.21905, 94.7807, 4.55501,
+  95.5208, 3.815, 96.7049, 3.815, 97.445, 4.55501, 98.185, 5.29502, 98.185,
+  6.47904, 97.445, 7.21906, 94.7808, 9.8831, 92.1166, 12.5471, 89.4523, 15.2112,
+  91.3025, 20.8353, 89.3043, 36.5975, 71.3949, 54.5058, 66.1405, 59.7599,
+  59.776, 64.496, 53.2635, 68.6401,
 ];
 
 const target = [
@@ -270,10 +295,54 @@ function convertSVGPathToFlatArray(pathString) {
   return matches.map(Number);
 }
 
-// Example usage:
-const svgPath =
-  "M 53.2635 68.6401 C 59.776 64.496 66.1405 59.7599 71.3949 54.5058 Z";
-const flatArray = convertSVGPathToFlatArray(svgPath);
+function getCubicAnchorPoints(flatArray, format = "tuples") {
+  if (
+    !Array.isArray(flatArray) ||
+    flatArray.length < 2 ||
+    (flatArray.length - 2) % 6 !== 0
+  ) {
+    throw new Error(
+      "Invalid Cubic Bézier array. Length must satisfy: 2 + 6 * N",
+    );
+  }
 
-console.log(flatArray);
-// Output: [53.2635, 68.6401, 59.776, 64.496, 66.1405, 59.7599, 71.3949, 54.5058]
+  const anchorPoints = [];
+
+  anchorPoints.push([flatArray[0], flatArray[1]]);
+
+  for (let i = 2; i < flatArray.length; i += 6) {
+    const endX = flatArray[i + 4];
+    const endY = flatArray[i + 5];
+    anchorPoints.push([endX, endY]);
+  }
+
+  return format === "flat" ? anchorPoints.flat() : anchorPoints;
+}
+
+function getFastCubicCentroid(flatArray) {
+  const len = flatArray.length;
+  if (!len || len < 8 || (len - 2) % 6 !== 0) return { x: 0, y: 0 };
+
+  let sumX = 0;
+  let sumY = 0;
+  let segmentCount = 0;
+
+  // Single loop over each cubic segment (6 numbers = 3 point pairs)
+  for (let i = 2; i < len; i += 6) {
+    // Sum all 4 control points defining the current cubic segment: P0, P1, P2, P3
+    const segX =
+      flatArray[i - 2] + flatArray[i] + flatArray[i + 2] + flatArray[i + 4];
+    const segY =
+      flatArray[i - 1] + flatArray[i + 1] + flatArray[i + 3] + flatArray[i + 5];
+
+    // Divide by 4 to get the segment's exact mean center
+    sumX += segX * 0.25;
+    sumY += segY * 0.25;
+    segmentCount++;
+  }
+
+  return {
+    x: sumX / segmentCount,
+    y: sumY / segmentCount,
+  };
+}

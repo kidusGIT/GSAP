@@ -9,7 +9,11 @@
 /* eslint-disable */
 
 import { getClosestAnchor, subdividePath } from "./subDivide.js";
-import { animateMorph, prepareForMorphing } from "./svgAlignment.js";
+import {
+  animateMorph,
+  prepareForMorphing,
+  rearrangedArray,
+} from "./svgAlignment.js";
 import {
   getRawPath,
   reverseSegment,
@@ -456,7 +460,7 @@ let gsap,
         reverseSegment(sb);
         // start[i] = reverseSegmentToArray(sb);
       }
-
+      rearrangedArray(sb, 0);
       shapeIndex =
         shapeIndices[i] || shapeIndices[i] === 0 ? shapeIndices[i] : "auto";
       if (shapeIndex) {
@@ -1068,8 +1072,8 @@ export const MorphSVGPlugin = {
     //   path = path.concat(animateMorph(start, end, ratio));
     // }
 
-    // // rawPath = path;
-
+    // rawPath = path;
+    //
     while (pt) {
       pt.r(ratio, pt.d);
       pt = pt._next;
