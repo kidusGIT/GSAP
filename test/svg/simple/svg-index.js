@@ -12,8 +12,8 @@ const seek = document.getElementById("btn-seek");
 
 let t;
 t = gsap.to("#rocket", {
-  morphSVG: "#lightning",
-  duration: 1.5,
+  morphSVG: "#bulb",
+  duration: 3.5,
 });
 
 pause.onclick = () => {

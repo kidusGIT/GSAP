@@ -26,4 +26,4 @@ Here is the step-by-step breakdown of what it does:
 
 ### Why is this used?
 
-When morphing Shape A into Shape B, choosing the wrong starting point makes the shape twist, flip, or deform unnaturally as it animates. Morphing engines call this function multiple times with different `shapeIndex` values to test different point pairings. The `shapeIndex` that yields the **lowest total distance `d**` produces the smoothest, visually cleanest animation transition.
+When morphing Shape A into Shape B, choosing the wrong starting point makes the shape twist, flip, or deform unnaturally as it animates. Morphing engines call this function multiple times with different `shapeIndex` values to test different point pairings. The `shapeIndex` that yields the lowest total distance `d` produces the smoothest, visually cleanest animation transition.

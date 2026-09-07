@@ -6,7 +6,7 @@ function pairPoints(arr) {
   return pairs;
 }
 
-function reverseCurve(coords) {
+export function reverseCurve(coords) {
   if (!Array.isArray(coords) || coords.length < 8) {
     return [];
   }
@@ -70,7 +70,7 @@ function reverseCurve(coords) {
   return output;
 }
 
-function getCurveDirection(points) {
+export function getCurveDirection(points) {
   let area = 0;
   for (let i = 0; i < points.length - 1; i++) {
     area += points[i].x * points[i + 1].y;
@@ -83,39 +83,54 @@ function getCurveDirection(points) {
   return area > 0 ? 1 : -1; // 1 = CCW, -1 = CW
 }
 
-function ensureSameDirection(source, target) {
+export function ensureSameDirection(source, target) {
   const srcDir = getCurveDirection(pairPoints(source));
   const tgtDir = getCurveDirection(pairPoints(target));
 
   if (srcDir !== tgtDir) {
     // Reverse target to match direction
-    return reverseCurve(target);
+    return reverseCurve(source);
   }
-  return target;
+  return source;
 }
 
-function findBestAlignment(source, target) {
-  let minDistance = Infinity;
-  let bestOffset = 0;
-  const sourcePoints = pairPoints(source);
-  const targetPoints = pairPoints(reverseCurve(target));
+function getCentroid(flatCoords) {
+  let sumX = 0;
+  let sumY = 0;
+  const totalCoords = flatCoords.length;
 
-  // Try all possible alignments
-  for (let offset = 0; offset < targetPoints.length; offset++) {
-    let totalDist = 0;
-    for (let i = 0; i < sourcePoints.length; i++) {
-      const srcIdx = i % sourcePoints.length;
-      const tgtIdx = (i + offset) % targetPoints.length;
-      const dx = sourcePoints[srcIdx].x - targetPoints[tgtIdx].x;
-      const dy = sourcePoints[srcIdx].y - targetPoints[tgtIdx].y;
-      totalDist += dx * dx + dy * dy;
-    }
-    if (totalDist < minDistance) {
-      minDistance = totalDist;
-      bestOffset = offset;
+  for (let i = 0; i < totalCoords; i += 2) {
+    sumX += flatCoords[i];
+    sumY += flatCoords[i + 1];
+  }
+
+  const pointCount = totalCoords / 2;
+
+  return {
+    x: sumX / pointCount,
+    y: sumY / pointCount,
+  };
+}
+
+export function findBestAlignment(source, target) {
+  let minDist = Infinity;
+  let minIndex = 0;
+
+  source = ensureSameDirection(source, target);
+  const targetCentroid = getCentroid(target);
+
+  for (let i = 0; i < source.length; i += 6) {
+    const dx = targetCentroid.x - source[i];
+    const dy = targetCentroid.y - source[i + 1];
+    const dist = Math.hypot(dx, dy);
+
+    if (dist < minDist) {
+      minDist = dist;
+      minIndex = i;
     }
   }
-  return bestOffset;
+
+  return minIndex;
 }
 
 function centerCurve(curve) {
@@ -193,6 +208,8 @@ export function rearrangedArray(source = [], x) {
   let src = source;
 
   const index = source.findIndex((v) => v === x);
+
+  console.log("index ", index);
 
   if (index === -1) {
     return [];
@@ -279,6 +296,10 @@ function convertFlatArrayToSVGPath(flatArray) {
 
   return path;
 }
+
+// console.log(convertFlatArrayToSVGPath(target));
+// const index = findBestAlignment(source, getCentroid(target));
+// console.log(index, " -> ", source[index], source[index + 1]);
 
 function convertSVGPathToFlatArray(pathString) {
   if (typeof pathString !== "string" || !pathString.trim()) {

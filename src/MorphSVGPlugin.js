@@ -11,6 +11,8 @@
 import { getClosestAnchor, subdividePath } from "./subDivide.js";
 import {
   animateMorph,
+  ensureSameDirection,
+  findBestAlignment,
   prepareForMorphing,
   rearrangedArray,
 } from "./svgAlignment.js";
@@ -460,7 +462,6 @@ let gsap,
         reverseSegment(sb);
         // start[i] = reverseSegmentToArray(sb);
       }
-      rearrangedArray(sb, 0);
       shapeIndex =
         shapeIndices[i] || shapeIndices[i] === 0 ? shapeIndices[i] : "auto";
       if (shapeIndex) {
@@ -471,6 +472,8 @@ let gsap,
             Math.abs(sb[1] - sb[sb.length - 1]) < 0.5)
         ) {
           if (shapeIndex === "auto" || shapeIndex === "log") {
+            const index = findBestAlignment(sb, eb);
+
             shapeIndices[i] = shapeIndex = _getClosestShapeIndex(
               sb,
               eb,
