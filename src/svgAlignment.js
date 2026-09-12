@@ -203,26 +203,6 @@ export function animateMorph(sourceArray, targetArray, progress) {
   return morphPoints(prepared.source, prepared.target, progress);
 }
 
-export function rearrangedArray(source = [], x) {
-  // 1. Ensure same number of points
-  let src = source;
-
-  const index = source.findIndex((v) => v === x);
-
-  console.log("index ", index);
-
-  if (index === -1) {
-    return [];
-  }
-
-  const offset = index;
-  src = reverseCurve(src);
-  src = reorderArray(src, offset);
-  // src = centerCurve(src);
-
-  return src;
-}
-
 function reorderArray(arr, shiftCoords) {
   const len = arr.length;
   const result = new Array(len);
@@ -369,7 +349,6 @@ function getFastCubicCentroid(flatArray) {
 }
 
 export function findCoordinateDistance(source, target) {
-  const result = [];
   let minDist = Infinity,
     minIndex = 0;
 
@@ -407,122 +386,105 @@ const tgt = [
   18.4409, 92.361,
 ];
 
-export function findMatchingSourceAnchor(source, target) {
-  const targetCentroid = getCentroid(target);
-  const sourceCentroid = getCentroid(source);
+function cubicBezierArrayToPath(flatArray) {
+  if (!flatArray || flatArray.length < 8) return "";
 
-  // 2. Compute angle of the target starting point relative to target centroid
-  const x = target[0],
-    y = target[1];
-  const targetAngle = Math.atan2(y - targetCentroid.y, x - targetCentroid.x);
+  // First point (x0, y0) is the start point (Move To)
+  let path = `M ${flatArray[0]} ${flatArray[1]}`;
 
-  // 3. Find source anchor with the closest angle relative to source centroid
-  let bestSourceIndex = -1;
-  let minAngleDiff = Infinity;
+  // Process control points in groups of 6 (cp1x, cp1y, cp2x, cp2y, x, y)
+  for (let i = 2; i < flatArray.length; i += 6) {
+    const cp1x = flatArray[i];
+    const cp1y = flatArray[i + 1];
+    const cp2x = flatArray[i + 2];
+    const cp2y = flatArray[i + 3];
+    const x = flatArray[i + 4];
+    const y = flatArray[i + 5];
 
-  for (let i = 0; i < source.length; i += 6) {
-    const sourceAngle = Math.atan2(
-      source[i + 1] - sourceCentroid.y,
-      source[i] - sourceCentroid.x,
-    );
+    path += ` C ${cp1x} ${cp1y} ${cp2x} ${cp2y} ${x} ${y}`;
+  }
 
-    // Calculate shortest distance between two angles (-PI to PI)
-    let diff = Math.abs(targetAngle - sourceAngle);
-    if (diff > Math.PI) {
-      diff = 2 * Math.PI - diff;
+  return path;
+}
+
+function normalizeCentroid(points = []) {
+  const { x, y } = getCentroid(points);
+  const normalized = [];
+
+  for (let index = 0; index < points.length; index += 2) {
+    const nx = points[index] - x;
+    const ny = points[index + 1] - y;
+    normalized.push(nx, ny);
+  }
+  return normalized;
+}
+
+export function closestIndex(source = [], target = []) {
+  if (!source.length || !target.length || source.length !== target.length) {
+    return 0;
+  }
+  const N = source.length;
+
+  let minDist = Infinity;
+  let bestK = 0;
+
+  const sourceNormalized = normalizeCentroid(source);
+  const targetNormalized = normalizeCentroid(target);
+
+  // k loops through each segment starting position (multiples of 6)
+  for (let k = 0; k < N; k += 6) {
+    let totalDist = 0;
+
+    for (let i = 0; i < N; i += 6) {
+      const index = (i + k) % N;
+      const dx = sourceNormalized[index] - targetNormalized[i];
+      const dy = sourceNormalized[index + 1] - targetNormalized[i + 1];
+
+      totalDist += dx * dx + dy * dy;
     }
 
-    // result.push({ index: i, distance: dist, x: source[i], y: source[i + 1] });
-    if (diff < minAngleDiff) {
-      minAngleDiff = diff;
-      bestSourceIndex = i;
+    if (totalDist < minDist) {
+      minDist = totalDist;
+      bestK = k;
     }
   }
 
-  return {
-    anchorIndex: bestSourceIndex,
-    anchorPoint: source[bestSourceIndex],
-    flatArrayIndex: bestSourceIndex * 6,
-  };
+  return bestK;
 }
 
-// Function to align and find the best start index for equal-length subdivided paths
-export function findBestSourceOffset(targetFlat, sourceFlat) {
-  // Extract anchor points (1 anchor point per 6 floats in flat cubic array)
-  const getAnchors = (flat) => {
-    const anchors = [];
-    // Exclude the duplicate closing point at the end
-    for (let i = 0; i < flat.length - 6; i += 6) {
-      anchors.push([flat[i], flat[i + 1]]);
-    }
-    return anchors;
-  };
+export function closestIndexRemake(source = [], target = []) {
+  if (!source.length || !target.length || source.length !== target.length) {
+    return 0;
+  }
+  const { x: sourceX, y: sourceY } = getCentroid(source);
+  const { x: targetX, y: targetY } = getCentroid(target);
 
-  const targetAnchors = getAnchors(targetFlat);
-  const sourceAnchors = getAnchors(sourceFlat);
-  const N = targetAnchors.length; // Number of anchor points
+  const N = source.length;
 
-  // 1. Normalize both shapes to origin [0, 0] & scale to fit [0, 1] bounding box
-  const normalize = (pts) => {
-    let minX = Infinity,
-      maxX = -Infinity,
-      minY = Infinity,
-      maxY = -Infinity;
-    pts.forEach(([x, y]) => {
-      if (x < minX) minX = x;
-      if (x > maxX) maxX = x;
-      if (y < minY) minY = y;
-      if (y > maxY) maxY = y;
-    });
-    const scaleX = maxX - minX || 1;
-    const scaleY = maxY - minY || 1;
+  let minDist = Infinity;
+  let bestK = 0;
+  const offsetX = sourceX - targetX;
+  const offsetY = sourceY - targetY;
 
-    return pts.map(([x, y]) => [(x - minX) / scaleX, (y - minY) / scaleY]);
-  };
+  // k loops through each segment starting position (multiples of 6)
+  for (let k = 0; k < N; k += 6) {
+    let totalDist = 0;
 
-  const normTarget = normalize(targetAnchors);
-  const normSource = normalize(sourceAnchors);
+    for (let i = 0; i < N; i += 6) {
+      const index = (i + k) % N;
 
-  let bestShift = 0;
-  let minTotalDistance = Infinity;
+      // Distance between anchor points ONLY
+      const dx = source[index] - (target[i] - offsetX);
+      const dy = source[index + 1] - (target[i + 1] - offsetY);
 
-  // 2. Test all N cyclic shifts (rotations)
-  for (let shift = 0; shift < N; shift++) {
-    let currentDistance = 0;
-
-    for (let i = 0; i < N; i++) {
-      const sourceIdx = (i + shift) % N;
-      const [tx, ty] = normTarget[i];
-      const [sx, sy] = normSource[sourceIdx];
-
-      // Sum of squared Euclidean distances between corresponding anchors
-      const dx = tx - sx;
-      const dy = ty - sy;
-      currentDistance += dx * dx + dy * dy;
+      totalDist += dx * dx + dy * dy;
     }
 
-    if (currentDistance < minTotalDistance) {
-      minTotalDistance = currentDistance;
-      bestShift = shift;
+    if (totalDist < minDist) {
+      minDist = totalDist;
+      bestK = k;
     }
   }
 
-  return {
-    sourceAnchorIndex: bestShift,
-    sourceFlatIndex: bestShift * 6,
-    matchedPoint: sourceAnchors[bestShift],
-  };
+  return bestK;
 }
-
-// Execution
-// const result = findBestSourceOffset(target, source);s
-
-// console.log("Best Source Anchor Index:", result.sourceAnchorIndex);
-// // Output: 18
-
-// console.log("Best Source Flat Array Index:", result.sourceFlatIndex);
-// // Output: 108
-
-// console.log("Start Point Coordinates:", result.matchedPoint);
-// // Output: [94.97955726965358, 9.68434442292815]
-// console.log("result ", findMatchingSourceAnchor(source, target));

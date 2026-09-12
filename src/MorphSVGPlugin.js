@@ -9,7 +9,7 @@
 /* eslint-disable */
 
 import { getClosestAnchor, subdividePath } from "./subDivide.js";
-import { findBestSourceOffset } from "./svgAlignment.js";
+import { closestIndex } from "./svgAlignment.js";
 import {
   getRawPath,
   reverseSegment,
@@ -450,7 +450,7 @@ let gsap,
         console.log("sb ", sb);
       }
 
-      segments.push({ start: [...sb], end: [...eb] });
+      // segments.push({ start: [...sb], end: [...eb] });
 
       if (reverse && fillSafe !== false && !sb.reversed) {
         reverseSegment(sb);
@@ -477,8 +477,8 @@ let gsap,
               reverseSegment(sb);
               shapeIndex = -shapeIndex;
             }
-
-            const newIdx = findBestSourceOffset(sb, eb);
+            const index = closestIndex(sb, eb);
+            // _offsetSegment(sb, index);
             _offsetSegment(sb, shapeIndex * 6);
           } else if (shapeIndex !== "reverse") {
             if (i && shapeIndex < 0) {
