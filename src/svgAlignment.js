@@ -112,27 +112,6 @@ function getCentroid(flatCoords) {
   };
 }
 
-export function findBestAlignment(source, target) {
-  let minDist = Infinity;
-  let minIndex = 0;
-
-  source = ensureSameDirection(source, target);
-  const targetCentroid = getCentroid(target);
-
-  for (let i = 0; i < source.length; i += 6) {
-    const dx = targetCentroid.x - source[i];
-    const dy = targetCentroid.y - source[i + 1];
-    const dist = Math.hypot(dx, dy);
-
-    if (dist < minDist) {
-      minDist = dist;
-      minIndex = i;
-    }
-  }
-
-  return minIndex;
-}
-
 function centerCurve(curve) {
   const points = pairPoints(curve);
   let cx = 0,
@@ -431,18 +410,6 @@ function cubicBezierArrayToPath(flatArray) {
   return path;
 }
 
-function normalizeCentroid(points = []) {
-  const { x, y } = getCentroid(points);
-  const normalized = [];
-
-  for (let index = 0; index < points.length; index += 2) {
-    const nx = points[index] - x;
-    const ny = points[index + 1] - y;
-    normalized.push(nx, ny);
-  }
-  return normalized;
-}
-
 export function closestIndex(source = [], target = []) {
   if (!source.length || !target.length || source.length !== target.length) {
     return 0;
@@ -513,15 +480,6 @@ export function closestIndexBest(source = [], target = []) {
   }
 
   return bestK;
-}
-
-function translatePoints(points, dx, dy) {
-  const translated = new Array(points.length);
-  for (let i = 0; i < points.length; i += 2) {
-    translated[i] = points[i] + dx; // Shift X
-    translated[i + 1] = points[i + 1] + dy; // Shift Y
-  }
-  return translated;
 }
 
 /**
