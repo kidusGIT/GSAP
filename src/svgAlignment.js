@@ -372,18 +372,42 @@ export function findCoordinateDistance(source, target) {
 }
 
 const src = [
-  20.1089, 77.0762, 21.737, 78.7042, 23.3652, 80.2582, 24.9193, 81.8863,
-  24.9193, 81.8863, 24.676348074521464, 83.24944614985297, 23.337337027842576,
-  85.01893627390409, 21.54095206421292, 87.39284159755368, 17.771851481483566,
-  90.4980953394801, 9.97012, 92.0244, 12.7083, 78.4082, 20.1089, 77.0762,
-  20.1089, 77.0762,
+  53.2635, 68.6401, 59.776, 64.496, 66.1405, 59.7599, 71.3949, 54.5058, 89.3043,
+  36.5975, 91.3025, 20.8353, 89.4523, 15.2112, 92.1166, 12.5471, 94.7808,
+  9.8831, 97.445, 7.21906, 98.185, 6.47904, 98.185, 5.29502, 97.445, 4.55501,
+  96.7049, 3.815, 95.5208, 3.815, 94.7807, 4.55501, 92.1165, 7.21905, 89.4523,
+  9.8831, 86.7881, 12.5471, 81.1637, 10.6971, 65.4005, 12.6951, 47.4911,
+  30.6034, 42.2366, 35.8575, 37.5003, 42.2216, 33.356, 48.7337, 27.3615,
+  47.2537, 16.9267, 47.2537, 9.6741, 55.3198, 1.38545, 64.422, 6.26983, 73.0801,
+  8.11997, 71.3041, 9.60009, 69.7501, 12.1163, 60.6479, 23.0691, 67.678, 21.293,
+  71.3781, 21.367, 73.6721, 22.5511, 74.7821, 24.1052, 76.3362, 25.6593,
+  77.8902, 27.2135, 79.4442, 28.3976, 80.6282, 30.6177, 80.7762, 34.392,
+  78.9262, 41.3486, 89.8784, 32.2459, 92.3944, 30.7657, 93.9484, 28.9156,
+  95.7245, 37.5743, 100.609, 46.677, 92.3204, 54.7436, 85.0683, 54.7436,
+  74.6341, 53.2635, 68.6401,
 ];
 
 const tgt = [
-  18.4409, 92.361, 14.1587, 77.9885, 9.94563, 63.5473, 5.66348, 49.1748,
-  11.4651, 47.5244, 17.1977, 45.8052, 22.9993, 44.086, 27.2123, 58.4584,
-  31.4945, 72.8997, 35.7766, 87.2722, 29.975, 88.9226, 24.1734, 90.6418,
-  18.4409, 92.361,
+  51.5, 19.5033, 56.7965, 19.5033, 61.6464, 21.0945, 65.6667, 23.895,
+  68.58568846132684, 25.893042893008996, 71.05549510295167, 28.5055005509034,
+  72.8919536694589, 31.54868472079145, 75.15058111228865, 35.29144233321436,
+  76.4512, 39.68572112272398, 76.4512, 44.3898, 76.4512, 49.06787714639158,
+  74.78911661688085, 53.04267561741297, 72.60399457401377, 56.53508272611073,
+  71.31072874091902, 58.602066034287795, 69.83424918379653, 60.50007384460639,
+  68.4107, 62.2749, 65.1562, 66.2848, 62.1569, 69.6581, 62.0931, 73.0315,
+  62.0931, 74.6864, 60.6254, 76.1503, 58.9024, 76.1503, 58.63467816955878,
+  76.1503, 58.36675094893746, 76.1503, 58.098641627041616, 76.1503,
+  53.63771619756874, 76.1503, 49.126378169558784, 76.1503, 44.6719, 76.1503,
+  42.8851, 76.1503, 41.4812, 74.6864, 41.4812, 73.0315, 41.32812845205166,
+  71.1074050377327, 40.24934287318233, 69.22726560439358, 38.73136193367624,
+  67.24340471067848, 37.085881562489526, 65.09291383505833, 34.92432892695039,
+  62.82054605973559, 32.8664, 60.2382, 29.548, 56.0374, 26.5488, 51.0092,
+  26.5488, 44.3898, 26.5488, 44.27385707046905, 26.54960057092677,
+  44.15808982645003, 26.551196386696816, 44.042503832887434, 26.65034611149295,
+  36.86102357235865, 29.819354512629705, 30.37921875258889, 34.7808, 25.9318,
+  36.09358791324521, 24.753320908611798, 37.52764314842434, 23.712286752689018,
+  39.06028484254135, 22.829697955238522, 42.742618937261085, 20.709184835345855,
+  46.994044892337634, 19.5033, 51.5, 19.5033,
 ];
 
 function cubicBezierArrayToPath(flatArray) {
@@ -424,21 +448,25 @@ export function closestIndex(source = [], target = []) {
     return 0;
   }
   const N = source.length;
+  const wrap = N - 2;
 
   let minDist = Infinity;
   let bestK = 0;
 
-  const sourceNormalized = normalizeCentroid(source);
-  const targetNormalized = normalizeCentroid(target);
+  const sourceCenter = getBoundingCenter(source);
+  const targetCenter = getBoundingCenter(target);
 
-  // k loops through each segment starting position (multiples of 6)
+  const dcx = sourceCenter.x - targetCenter.x;
+  const dcy = sourceCenter.y - targetCenter.y;
+
   for (let k = 0; k < N; k += 6) {
     let totalDist = 0;
 
     for (let i = 0; i < N; i += 6) {
-      const index = (i + k) % N;
-      const dx = sourceNormalized[index] - targetNormalized[i];
-      const dy = sourceNormalized[index + 1] - targetNormalized[i + 1];
+      const index = (i + k) % wrap;
+
+      const dx = source[index] - (target[i] + dcx);
+      const dy = source[index + 1] - (target[i + 1] + dcy);
 
       totalDist += dx * dx + dy * dy;
     }
@@ -452,7 +480,7 @@ export function closestIndex(source = [], target = []) {
   return bestK;
 }
 
-export function closestIndexRemake(source = [], target = []) {
+export function closestIndexBest(source = [], target = []) {
   if (!source.length || !target.length || source.length !== target.length) {
     return 0;
   }
@@ -460,20 +488,18 @@ export function closestIndexRemake(source = [], target = []) {
   const { x: targetX, y: targetY } = getCentroid(target);
 
   const N = source.length;
+  const wrap = N - 2;
 
   let minDist = Infinity;
   let bestK = 0;
   const offsetX = sourceX - targetX;
   const offsetY = sourceY - targetY;
 
-  // k loops through each segment starting position (multiples of 6)
   for (let k = 0; k < N; k += 6) {
     let totalDist = 0;
 
     for (let i = 0; i < N; i += 6) {
-      const index = (i + k) % N;
-
-      // Distance between anchor points ONLY
+      const index = (i + k) % wrap;
       const dx = source[index] - (target[i] - offsetX);
       const dy = source[index + 1] - (target[i + 1] - offsetY);
 
@@ -488,3 +514,81 @@ export function closestIndexRemake(source = [], target = []) {
 
   return bestK;
 }
+
+function translatePoints(points, dx, dy) {
+  const translated = new Array(points.length);
+  for (let i = 0; i < points.length; i += 2) {
+    translated[i] = points[i] + dx; // Shift X
+    translated[i + 1] = points[i + 1] + dy; // Shift Y
+  }
+  return translated;
+}
+
+/**
+ * Calculates the bounding box center of a flat 2D point array [x0, y0, x1, y1, ...]
+ */
+function getBoundingCenter(points) {
+  let minX = Infinity,
+    maxX = -Infinity;
+  let minY = Infinity,
+    maxY = -Infinity;
+
+  for (let i = 0; i < points.length; i += 2) {
+    const x = points[i];
+    const y = points[i + 1];
+
+    if (x < minX) minX = x;
+    if (x > maxX) maxX = x;
+    if (y < minY) minY = y;
+    if (y > maxY) maxY = y;
+  }
+
+  return {
+    x: (minX + maxX) / 2,
+    y: (minY + maxY) / 2,
+  };
+}
+
+/**
+ * Translates source points so their center matches target center
+ */
+function translateToCenter(source, target) {
+  const sourceCenter = getBoundingCenter(source);
+  const targetCenter = getBoundingCenter(target);
+
+  // const dx = targetCenter.x - sourceCenter.x;
+  // const dy = targetCenter.y - sourceCenter.y;
+
+  const dx = sourceCenter.x - targetCenter.x;
+  const dy = sourceCenter.y - targetCenter.y;
+
+  const result = new Array(target.length);
+  for (let i = 0; i < target.length; i += 2) {
+    result[i] = target[i] + dx;
+    result[i + 1] = target[i + 1] + dy;
+  }
+
+  return result;
+}
+
+function translateUsingCentroid(source, target) {
+  const { x: sourceX, y: sourceY } = getCentroid(source);
+  const { x: targetX, y: targetY } = getCentroid(target);
+
+  const offsetX = sourceX - targetX;
+  const offsetY = sourceY - targetY;
+
+  const result = new Array(target.length);
+  for (let i = 0; i < target.length; i += 2) {
+    result[i] = target[i] - offsetX;
+    result[i + 1] = target[i + 1] - offsetY;
+  }
+
+  return result;
+}
+
+// Usage:
+const centeredSource = translateUsingCentroid(src, tgt);
+// const centeredSource = translateToCenter(src, tgt);
+
+console.log(cubicBezierArrayToPath(centeredSource));

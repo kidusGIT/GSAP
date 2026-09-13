@@ -9,7 +9,7 @@
 /* eslint-disable */
 
 import { getClosestAnchor, subdividePath } from "./subDivide.js";
-import { closestIndex } from "./svgAlignment.js";
+import { closestIndex, closestIndexBest } from "./svgAlignment.js";
 import {
   getRawPath,
   reverseSegment,
@@ -454,7 +454,6 @@ let gsap,
 
       if (reverse && fillSafe !== false && !sb.reversed) {
         reverseSegment(sb);
-        // start[i] = reverseSegmentToArray(sb);
       }
       shapeIndex =
         shapeIndices[i] || shapeIndices[i] === 0 ? shapeIndices[i] : "auto";
@@ -478,8 +477,8 @@ let gsap,
               shapeIndex = -shapeIndex;
             }
             const index = closestIndex(sb, eb);
-            // _offsetSegment(sb, index);
-            _offsetSegment(sb, shapeIndex * 6);
+            _offsetSegment(sb, index);
+            // _offsetSegment(sb, shapeIndex * 6);
           } else if (shapeIndex !== "reverse") {
             if (i && shapeIndex < 0) {
               //only happens if an array is passed as shapeIndex and a negative value is defined for an index beyond 0. Very rare, but helpful sometimes.
