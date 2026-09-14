@@ -545,8 +545,6 @@ function translateUsingCentroid(source, target) {
   return result;
 }
 
-// Usage:
-const centeredSource = translateUsingCentroid(src, tgt);
-// const centeredSource = translateToCenter(src, tgt);
-
-console.log(cubicBezierArrayToPath(centeredSource));
+// // Usage:
+// const centeredSource = translateUsingCentroid(src, tgt);
+// // const centeredSource = translateToCenter(src, tgt);

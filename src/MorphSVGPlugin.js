@@ -9,7 +9,11 @@
 /* eslint-disable */
 
 import { getClosestAnchor, subdividePath } from "./subDivide.js";
-import { closestIndex, closestIndexBest } from "./svgAlignment.js";
+import {
+  closestIndex,
+  closestIndexBest,
+  ensureSameDirection,
+} from "./svgAlignment.js";
 import {
   getRawPath,
   reverseSegment,
@@ -476,6 +480,9 @@ let gsap,
               reverseSegment(sb);
               shapeIndex = -shapeIndex;
             }
+
+            // start[i] = sb = ensureSameDirection(sb, eb);
+
             const index = closestIndex(sb, eb);
             _offsetSegment(sb, index);
             // _offsetSegment(sb, shapeIndex * 6);
