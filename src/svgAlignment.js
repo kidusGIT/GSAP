@@ -83,12 +83,36 @@ export function getCurveDirection(points) {
   return area > 0 ? 1 : -1; // 1 = CCW, -1 = CW
 }
 
-export function ensureSameDirection(source, target) {
+export function areSameDirection(source, target) {
+  return (
+    getCurveDirection(pairPoints(source)) ===
+    getCurveDirection(pairPoints(target))
+  );
+}
+
+// if (reverse) {
+//   reverseSegment(sb);
+// }
+
+// const sameDirection = areSameDirection(sb, eb);
+// if (!i && !sameDirection) {
+//   reverseSegment(sb);
+//   reverse = true;
+// }
+
+export function ensureSameDirection(source, target, same) {
+  if (typeof same !== "boolean") {
+    if (!same) {
+      return reverseCurve(source);
+    }
+    return source;
+  }
+
   const srcDir = getCurveDirection(pairPoints(source));
   const tgtDir = getCurveDirection(pairPoints(target));
 
   if (srcDir !== tgtDir) {
-    // Reverse target to match direction
+    // Reverse source to match direction
     return reverseCurve(source);
   }
   return source;

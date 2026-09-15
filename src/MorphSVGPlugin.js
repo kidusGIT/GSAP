@@ -10,6 +10,7 @@
 
 import { getClosestAnchor, subdividePath } from "./subDivide.js";
 import {
+  areSameDirection,
   closestIndex,
   closestIndexBest,
   ensureSameDirection,
@@ -454,8 +455,6 @@ let gsap,
         console.log("sb ", sb);
       }
 
-      // segments.push({ start: [...sb], end: [...eb] });
-
       if (reverse && fillSafe !== false && !sb.reversed) {
         reverseSegment(sb);
       }
@@ -469,6 +468,17 @@ let gsap,
             Math.abs(sb[1] - sb[sb.length - 1]) < 0.5)
         ) {
           if (shapeIndex === "auto" || shapeIndex === "log") {
+            // if (reverse) {
+            //   reverseSegment(sb);
+            // }
+            // const sameDirection = areSameDirection(sb, eb);
+            // if (!i && !sameDirection) {
+            //   reverseSegment(sb);
+            //   reverse = true;
+            // }
+            // const index = closestIndex(sb, eb);
+            // _offsetSegment(sb, index);
+
             shapeIndices[i] = shapeIndex = _getClosestShapeIndex(
               sb,
               eb,
@@ -480,12 +490,7 @@ let gsap,
               reverseSegment(sb);
               shapeIndex = -shapeIndex;
             }
-
-            // start[i] = sb = ensureSameDirection(sb, eb);
-
-            const index = closestIndex(sb, eb);
-            _offsetSegment(sb, index);
-            // _offsetSegment(sb, shapeIndex * 6);
+            _offsetSegment(sb, shapeIndex * 6);
           } else if (shapeIndex !== "reverse") {
             if (i && shapeIndex < 0) {
               //only happens if an array is passed as shapeIndex and a negative value is defined for an index beyond 0. Very rare, but helpful sometimes.
@@ -523,9 +528,7 @@ let gsap,
     }
     log && _log("shapeIndex:[" + shapeIndices.join(",") + "]");
     start.shapeIndex = shapeIndices;
-    if (tween) {
-      tween._testSegs = segments;
-    }
+
     return shapeIndices;
   },
   _pathFilter = (a, shapeIndex, map, precompile, fillSafe) => {
