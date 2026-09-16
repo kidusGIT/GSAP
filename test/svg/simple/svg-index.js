@@ -13,7 +13,12 @@ const seek = document.getElementById("btn-seek");
 let t;
 t = gsap.to("#rocket", {
   // morphSVG: "#bulb",
-  morphSVG: { shape: "#bulb", shapeIndex: 10 },
+  morphSVG: {
+    shape: "#bulb",
+    type: "rotational",
+    origin: "90% 100%",
+  },
+
   duration: 3.5,
 });
 

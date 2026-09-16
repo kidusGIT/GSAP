@@ -381,8 +381,6 @@ let gsap,
       return;
     }
 
-    const segments = [];
-
     if (longer.length > 1) {
       start.sort(sortMethod);
       end.sort(sortMethod);
