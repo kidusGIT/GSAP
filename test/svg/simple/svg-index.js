@@ -14,9 +14,9 @@ let t;
 t = gsap.to("#rocket", {
   // morphSVG: "#bulb",
   morphSVG: {
-    shape: "#bulb",
+    shape: "#lightning",
     type: "rotational",
-    origin: "90% 100%",
+    origin: "50% 50%",
   },
 
   duration: 3.5,
