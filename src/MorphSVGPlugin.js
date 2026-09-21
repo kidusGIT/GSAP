@@ -1068,9 +1068,9 @@ export const MorphSVGPlugin = {
       cos,
       offset;
 
-    const tween = data._tween;
-    const tweenSegments = tween._testSegs;
-    let path = [];
+    // const tween = data._tween;
+    // const tweenSegments = tween._testSegs;
+    // let path = [];
 
     // for (let k = 0; k < tweenSegments.length; k++) {
     //   const { start, end } = tweenSegments[k];
@@ -1107,7 +1107,8 @@ export const MorphSVGPlugin = {
       }
 
       //smooth out the control points
-      easeInOut = ratio < 0.5 ? 2 * ratio * ratio : (4 - 2 * ratio) * ratio - 1;
+      // easeInOut = ratio < 0.5 ? 2 * ratio * ratio : (4 - 2 * ratio) * ratio - 1;
+      easeInOut = ratio;
       while (controlPT) {
         i = controlPT.i;
         segment = rawPath[controlPT.j];

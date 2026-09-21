@@ -11,10 +11,10 @@ const resume = document.getElementById("btn-resume");
 const seek = document.getElementById("btn-seek");
 
 let t;
-t = gsap.to("#rocket", {
-  // morphSVG: "#bulb",
+t = gsap.to("#circle", {
+  // morphSVG: "#rect",
   morphSVG: {
-    shape: "#lightning",
+    shape: "#rect",
     type: "rotational",
     origin: "50% 50%",
   },
