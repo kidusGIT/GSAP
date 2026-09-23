@@ -705,8 +705,8 @@ let gsap,
         a = _atan2(y, x);
         a2 = _atan2(y2, x2);
         if (Math.abs(a - a2) < limit) {
-          smoothData[l - 2] = a;
-          smoothData[2] = a2;
+          // smoothData[l - 2] = a;
+          // smoothData[2] = a2;
           smoothData[l - 1] = _sqrt(x * x + y * y);
           smoothData[3] = _sqrt(x2 * x2 + y2 * y2);
           isSmooth[l - 2] = isSmooth[l - 1] = true; //don't change indexes 2 and 3 because we'll trigger everything from the END, and this will optimize file size a bit.
@@ -763,10 +763,11 @@ let gsap,
         _next: this._anchorPT,
         t: start,
         sa: sa, //starting angle
-        ca:
-          linkedPT && short * linkedPT.ca < 0 && Math.abs(short) > _angleMax
-            ? angleDif
-            : short, //change in angle
+        // ca:
+        //   linkedPT && short * linkedPT.ca < 0 && Math.abs(short) > _angleMax
+        //     ? angleDif
+        //     : short, //change in angle
+        ca: short, //change in angle
         sl: d, //starting length
         cl: _sqrt(dx * dx + dy * dy) - d, //change in length
         i: i,
@@ -946,6 +947,7 @@ export const MorphSVGPlugin = {
               endSeg[i + 1] !== startSeg[i + 1]
             ) {
               if (useRotation) {
+                // _tweenRotation for only aligning to center
                 if (startSmooth[i] && endSmooth[i]) {
                   //if BOTH starting and ending values are smooth (meaning control points have basically the same slope), interpolate the rotation and length instead of the coordinates (this is what makes things smooth).
                   sData = startSeg.smoothData;
@@ -960,6 +962,7 @@ export const MorphSVGPlugin = {
                     l2s: sData[offset],
                     l2c: eData[offset] - sData[offset],
                   };
+
                   pt = this._tweenRotation(startSeg, endSeg, i + 2);
                   this._tweenRotation(startSeg, endSeg, i, pt);
                   this._tweenRotation(startSeg, endSeg, offset - 1, pt);
@@ -1078,7 +1081,6 @@ export const MorphSVGPlugin = {
     // }
 
     // rawPath = path;
-    //
     while (pt) {
       pt.r(ratio, pt.d);
       pt = pt._next;
@@ -1105,7 +1107,6 @@ export const MorphSVGPlugin = {
         anchorPT.t[anchorPT.i + 1] = data._origin.y + _sin(angle) * l;
         anchorPT = anchorPT._next;
       }
-
       //smooth out the control points
       // easeInOut = ratio < 0.5 ? 2 * ratio * ratio : (4 - 2 * ratio) * ratio - 1;
       easeInOut = ratio;
@@ -1119,11 +1120,12 @@ export const MorphSVGPlugin = {
         ); //average the angles
         sin = _sin(angle);
         cos = _cos(angle);
-        x = segment[i + 2];
-        y = segment[i + 3];
+        x = segment[i + 2]; // -> anchor point 1
+        y = segment[i + 3]; // -> anchor point 2
         l = controlPT.l1s + easeInOut * controlPT.l1c; //length
         segment[i] = x - cos * l;
         segment[i + 1] = y - sin * l;
+
         l = controlPT.l2s + easeInOut * controlPT.l2c;
         segment[offset - 1] = x + cos * l;
         segment[offset] = y + sin * l;
