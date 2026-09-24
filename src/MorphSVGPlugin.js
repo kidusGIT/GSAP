@@ -8,6 +8,7 @@
  */
 /* eslint-disable */
 
+import { ArraySVGMorpher, pathString } from "./PolarSVGMorpher.js";
 import { getClosestAnchor, subdividePath } from "./subDivide.js";
 import {
   areSameDirection,
@@ -785,7 +786,7 @@ let gsap,
       _log("Please gsap.registerPlugin(MorphSVGPlugin)");
     }
   };
-
+let rotational;
 export const MorphSVGPlugin = {
   version: "3.13.0",
   name: "morphSVG",
@@ -795,6 +796,7 @@ export const MorphSVGPlugin = {
     PluginClass = Plugin;
     _initCore();
   },
+
   init(target, value, tween, index, targets) {
     _coreInitted || _initCore(1);
     if (!value) {
@@ -909,6 +911,8 @@ export const MorphSVGPlugin = {
         }
         useRotation = (value.type || MorphSVGPlugin.defaultType) !== "linear";
         if (useRotation) {
+          rotational = new ArraySVGMorpher(start, end);
+
           start = _populateSmoothData(start, value.smoothTolerance);
           end = _populateSmoothData(end, value.smoothTolerance);
           if (!start.size) {
@@ -1107,6 +1111,8 @@ export const MorphSVGPlugin = {
         anchorPT.t[anchorPT.i + 1] = data._origin.y + _sin(angle) * l;
         anchorPT = anchorPT._next;
       }
+
+      const str = pathString(rawPath, rnd);
       //smooth out the control points
       // easeInOut = ratio < 0.5 ? 2 * ratio * ratio : (4 - 2 * ratio) * ratio - 1;
       easeInOut = ratio;
@@ -1133,6 +1139,7 @@ export const MorphSVGPlugin = {
       }
 
       target._gsRawPath = rawPath;
+      // const pathD = rotational.evaluate(ratio);
 
       if (data._apply) {
         s = "";
@@ -1150,12 +1157,11 @@ export const MorphSVGPlugin = {
             //this is actually faster than just doing a join() on the array, possibly because the numbers have so many decimal places
             s += ((segment[i] * rnd) | 0) / rnd + space;
           }
-
-          console.log("s ", s);
         }
         if (data._prop) {
           target[data._prop] = s;
         } else {
+          // target.setAttribute("d", pathD);
           target.setAttribute("d", s);
         }
       }
