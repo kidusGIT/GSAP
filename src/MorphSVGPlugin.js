@@ -9,7 +9,11 @@
 /* eslint-disable */
 
 import { ArraySVGMorpher, pathString } from "./PolarSVGMorpher.js";
-import { getClosestAnchor, subdividePath } from "./subDivide.js";
+import {
+  getClosestAnchor,
+  makeBothPointsSmooth,
+  subdividePath,
+} from "./subDivide.js";
 import {
   areSameDirection,
   closestIndex,
@@ -1129,12 +1133,28 @@ export const MorphSVGPlugin = {
         x = segment[i + 2]; // -> anchor point 1
         y = segment[i + 3]; // -> anchor point 2
         l = controlPT.l1s + easeInOut * controlPT.l1c; //length
+
+        const l2 = controlPT.l2s + easeInOut * controlPT.l2c; //length
+
+        const { incoming, outgoing } = makeBothPointsSmooth(
+          { x: segment[i], y: segment[i + 1] },
+          { x, y },
+          { x: segment[offset - 1], y: segment[offset] },
+          { r1: l, r2: l2 },
+        );
+
         segment[i] = x - cos * l;
         segment[i + 1] = y - sin * l;
+
+        // segment[i] = incoming.x;
+        // segment[i + 1] = incoming.y;
 
         l = controlPT.l2s + easeInOut * controlPT.l2c;
         segment[offset - 1] = x + cos * l;
         segment[offset] = y + sin * l;
+
+        // segment[offset - 1] = outgoing.x;
+        // segment[offset] = outgoing.y;
         controlPT = controlPT._next;
       }
 

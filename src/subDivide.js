@@ -512,6 +512,54 @@ const end = [
   47.1, 0.8,
 ];
 
-console.log(cubicBezierPoints(start));
-console.log("\n");
-console.log(cubicBezierPoints(end));
+// console.log(cubicBezierPoints(start));
+// console.log("\n");
+// console.log(cubicBezierPoints(end));
+
+export function makeBothPointsSmooth(p1, anchor, p3, options = {}) {
+  const { symmetric = false, r1, r2 } = options;
+
+  // 1. Calculate incoming vector (from anchor to p1)
+  const dx1 = p1.x - anchor.x;
+  const dy1 = p1.y - anchor.y;
+  let angle1 = Math.atan2(dy1, dx1);
+
+  // 2. Calculate outgoing vector (from anchor to p3)
+  const dx3 = p3.x - anchor.x;
+  const dy3 = p3.y - anchor.y;
+  let angle3 = Math.atan2(dy3, dx3);
+
+  // 3. Compute original handle distances
+  let _r1 = r1 ?? Math.hypot(dx1, dy1);
+  let _r3 = r2 ?? Math.hypot(dx3, dy3);
+
+  if (symmetric) {
+    const avgLen = (_r1 + _r3) / 2;
+    _r1 = avgLen;
+    _r3 = avgLen;
+  }
+
+  // 4. Calculate bisector angle (midpoint angle)
+  // Shift angle1 by PI so both vectors point outward from anchor
+  let outgoingTargetAngle = angle1 + Math.PI;
+
+  // Average the two outward angles
+  let diff = angle3 - outgoingTargetAngle;
+  // Normalize angle difference to [-PI, PI]
+  diff = Math.atan2(Math.sin(diff), Math.cos(diff));
+
+  const smoothAngle = outgoingTargetAngle + diff / 2;
+
+  // 5. Calculate new control points pointing in exact opposite directions
+  return {
+    incoming: {
+      x: anchor.x - _r1 * Math.cos(smoothAngle),
+      y: anchor.y - _r1 * Math.sin(smoothAngle),
+    },
+    anchor: anchor,
+    outgoing: {
+      x: anchor.x + _r3 * Math.cos(smoothAngle),
+      y: anchor.y + _r3 * Math.sin(smoothAngle),
+    },
+  };
+}
