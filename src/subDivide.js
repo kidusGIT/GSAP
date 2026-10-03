@@ -517,7 +517,7 @@ const end = [
 // console.log(cubicBezierPoints(end));
 
 export function makeBothPointsSmooth(p1, anchor, p3, options = {}) {
-  const { symmetric = false, r1, r2 } = options;
+  const { symmetric = false, ir, or } = options;
 
   // 1. Calculate incoming vector (from anchor to p1)
   const dx1 = p1.x - anchor.x;
@@ -530,8 +530,8 @@ export function makeBothPointsSmooth(p1, anchor, p3, options = {}) {
   let angle3 = Math.atan2(dy3, dx3);
 
   // 3. Compute original handle distances
-  let _r1 = r1 ?? Math.hypot(dx1, dy1);
-  let _r3 = r2 ?? Math.hypot(dx3, dy3);
+  let _r1 = ir ?? Math.hypot(dx1, dy1);
+  let _r3 = or ?? Math.hypot(dx3, dy3);
 
   if (symmetric) {
     const avgLen = (_r1 + _r3) / 2;
@@ -561,5 +561,68 @@ export function makeBothPointsSmooth(p1, anchor, p3, options = {}) {
       x: anchor.x + _r3 * Math.cos(smoothAngle),
       y: anchor.y + _r3 * Math.sin(smoothAngle),
     },
+  };
+}
+
+export function isSmoothJoint(cp1, ap, cp2, limit = 0.03) {
+  const { x, y } = cp1;
+  const { x: ax, y: ay } = ap;
+  const { x: x2, y: y2 } = cp2;
+
+  // Vector from cp1 -> anchor point (ap)
+  const dx = ax - x;
+  const dy = ay - y;
+
+  // Vector from anchor point (ap) -> cp2
+  const dx2 = x2 - ax;
+  const dy2 = y2 - ay;
+
+  const angle1 = Math.atan2(dy, dx);
+  const angle2 = Math.atan2(dy2, dx2);
+
+  // Normalize angle difference to the range [-PI, PI] to handle boundary wraparound
+  let diff = Math.abs(angle1 - angle2);
+  if (diff > Math.PI) {
+    diff = 2 * Math.PI - diff;
+  }
+
+  const smooth = diff < limit;
+
+  return smooth;
+}
+
+/**
+ * Checks smoothness at a joint between two cubic Bézier curves.
+ *
+ * @param {[number, number]} inCP - Control point before joint [x, y]
+ * @param {[number, number]} joint - Joint point where curves connect [x, y]
+ * @param {[number, number]} outCP - Control point after joint [x, y]
+ * @param {number} tolerance - Epsilon tolerance for floating-point calculations
+ * @returns {{ G1_smooth: boolean, C1_smooth: boolean }} Smoothness status
+ */
+function checkBezierJointSmoothness(inCP, joint, outCP, tolerance = 1e-5) {
+  // Vectors from joint to adjacent control points
+  const v1 = [inCP[0] - joint[0], inCP[1] - joint[1]];
+  const v2 = [outCP[0] - joint[0], outCP[1] - joint[1]];
+
+  // 2D Cross product (determinant) to check collinearity
+  const crossProduct = v1[0] * v2[1] - v1[1] * v2[0];
+
+  // Dot product to ensure control points are on OPPOSITE sides of the joint
+  const dotProduct = v1[0] * v2[0] + v1[1] * v2[1];
+
+  const isCollinear = Math.abs(crossProduct) < tolerance;
+  const isOppositeDirection = dotProduct < 0;
+
+  const isG1Smooth = isCollinear && isOppositeDirection;
+
+  // Check handle lengths for C1 continuity (equal velocity)
+  const len1 = Math.hypot(v1[0], v1[1]);
+  const len2 = Math.hypot(v2[0], v2[1]);
+  const isC1Smooth = isG1Smooth && Math.abs(len1 - len2) < tolerance;
+
+  return {
+    G1_smooth: isG1Smooth, // Visual smoothness (collinear, opposite directions)
+    C1_smooth: isC1Smooth, // Parametric smoothness (equal handle lengths)
   };
 }
