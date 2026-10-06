@@ -11,6 +11,7 @@
 import { ArraySVGMorpher, pathString } from "./PolarSVGMorpher.js";
 import {
   getClosestAnchor,
+  isSmoothJoint,
   makeBothPointsSmooth,
   subdividePath,
 } from "./subDivide.js";
@@ -694,8 +695,8 @@ let gsap,
         a2 = _atan2(y2, x2);
         smooth = Math.abs(a - a2) < limit;
         if (smooth) {
-          smoothData[i - 2] = a;
-          smoothData[i + 2] = a2;
+          // smoothData[i - 2] = a;
+          // smoothData[i + 2] = a2;
           smoothData[i - 1] = _sqrt(x * x + y * y);
           smoothData[i + 3] = _sqrt(x2 * x2 + y2 * y2);
         }
@@ -915,8 +916,6 @@ export const MorphSVGPlugin = {
         }
         useRotation = (value.type || MorphSVGPlugin.defaultType) !== "linear";
         if (useRotation) {
-          rotational = new ArraySVGMorpher(start, end);
-
           start = _populateSmoothData(start, value.smoothTolerance);
           end = _populateSmoothData(end, value.smoothTolerance);
           if (!start.size) {
@@ -969,6 +968,11 @@ export const MorphSVGPlugin = {
                     l1c: eData[i + 1] - sData[i + 1],
                     l2s: sData[offset],
                     l2c: eData[offset] - sData[offset],
+
+                    sir: sData[i + 1], // incoming handle radius for the start segment
+                    eir: eData[i + 1], // incoming handle radius for the end segment
+                    sor: sData[offset], // outgoing handle radius for the start segment
+                    eor: eData[offset], // outgoing handle radius for the end segment
                   };
 
                   pt = this._tweenRotation(startSeg, endSeg, i + 2);
@@ -1134,27 +1138,41 @@ export const MorphSVGPlugin = {
         y = segment[i + 3]; // -> anchor point 2
         l = controlPT.l1s + easeInOut * controlPT.l1c; //length
 
-        const l2 = controlPT.l2s + easeInOut * controlPT.l2c; //length
+        const dir = controlPT.sir + (controlPT.eir - controlPT.sir) * easeInOut;
+        const dor = controlPT.sor + (controlPT.eor - controlPT.sor) * easeInOut;
+
+        const sp1 = isSmoothJoint(
+          { x: segment[i], y: segment[i + 1] },
+          { x, y },
+          { x: segment[offset - 1], y: segment[offset] },
+        );
 
         const { incoming, outgoing } = makeBothPointsSmooth(
           { x: segment[i], y: segment[i + 1] },
           { x, y },
           { x: segment[offset - 1], y: segment[offset] },
-          { r1: l, r2: l2 },
+          { ir: dir, or: dor },
         );
 
-        segment[i] = x - cos * l;
-        segment[i + 1] = y - sin * l;
+        // segment[i] = x - cos * l;
+        // segment[i + 1] = y - sin * l;
 
-        // segment[i] = incoming.x;
-        // segment[i + 1] = incoming.y;
+        segment[i] = incoming.x;
+        segment[i + 1] = incoming.y;
 
-        l = controlPT.l2s + easeInOut * controlPT.l2c;
-        segment[offset - 1] = x + cos * l;
-        segment[offset] = y + sin * l;
+        // l = controlPT.l2s + easeInOut * controlPT.l2c;
+        // segment[offset - 1] = x + cos * l;
+        // segment[offset] = y + sin * l;
 
-        // segment[offset - 1] = outgoing.x;
-        // segment[offset] = outgoing.y;
+        segment[offset - 1] = outgoing.x;
+        segment[offset] = outgoing.y;
+
+        const sp2 = isSmoothJoint(
+          { x: segment[i], y: segment[i + 1] },
+          { x, y },
+          { x: segment[offset - 1], y: segment[offset] },
+        );
+
         controlPT = controlPT._next;
       }
 
