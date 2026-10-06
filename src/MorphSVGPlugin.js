@@ -458,9 +458,9 @@ let gsap,
         console.log("sb ", sb);
       }
 
-      if (reverse && fillSafe !== false && !sb.reversed) {
-        reverseSegment(sb);
-      }
+      // if (reverse && fillSafe !== false && !sb.reversed) {
+      //   reverseSegment(sb);
+      // }
       shapeIndex =
         shapeIndices[i] || shapeIndices[i] === 0 ? shapeIndices[i] : "auto";
       if (shapeIndex) {
@@ -471,29 +471,29 @@ let gsap,
             Math.abs(sb[1] - sb[sb.length - 1]) < 0.5)
         ) {
           if (shapeIndex === "auto" || shapeIndex === "log") {
-            // if (reverse) {
-            //   reverseSegment(sb);
-            // }
-            // const sameDirection = areSameDirection(sb, eb);
-            // if (!i && !sameDirection) {
-            //   reverseSegment(sb);
-            //   reverse = true;
-            // }
-            // const index = closestIndex(sb, eb);
-            // _offsetSegment(sb, index);
-
-            shapeIndices[i] = shapeIndex = _getClosestShapeIndex(
-              sb,
-              eb,
-              !i || fillSafe === false,
-            );
-
-            if (shapeIndex < 0) {
-              reverse = true;
+            if (reverse) {
               reverseSegment(sb);
-              shapeIndex = -shapeIndex;
             }
-            _offsetSegment(sb, shapeIndex * 6);
+            const sameDirection = areSameDirection(sb, eb);
+            if (!i && !sameDirection) {
+              reverseSegment(sb);
+              reverse = true;
+            }
+            const index = closestIndex(sb, eb);
+            _offsetSegment(sb, index);
+
+            // shapeIndices[i] = shapeIndex = _getClosestShapeIndex(
+            //   sb,
+            //   eb,
+            //   !i || fillSafe === false,
+            // );
+
+            // if (shapeIndex < 0) {
+            //   reverse = true;
+            //   reverseSegment(sb);
+            //   shapeIndex = -shapeIndex;
+            // }
+            // _offsetSegment(sb, shapeIndex * 6);
           } else if (shapeIndex !== "reverse") {
             if (i && shapeIndex < 0) {
               //only happens if an array is passed as shapeIndex and a negative value is defined for an index beyond 0. Very rare, but helpful sometimes.

@@ -70,6 +70,27 @@ export function reverseCurve(coords) {
   return output;
 }
 
+function getFlatCubicAnchorDirection(flatArray) {
+  let area = 0;
+
+  // Loop through segments, stopping before the last anchor to prevent out-of-bounds
+  for (let i = 0; i < flatArray.length - 7; i += 6) {
+    area += flatArray[i] * flatArray[i + 7];
+    area -= flatArray[i + 6] * flatArray[i + 1];
+  }
+
+  // Last anchor to the first anchor (Wrap-around)
+  const lastX = flatArray[flatArray.length - 2];
+  const lastY = flatArray[flatArray.length - 1];
+  const firstX = flatArray[0];
+  const firstY = flatArray[1];
+
+  area += lastX * firstY;
+  area -= firstX * lastY;
+
+  return area > 0 ? 1 : -1; // 1 = CCW, -1 = CW
+}
+
 export function getCurveDirection(points) {
   let area = 0;
   for (let i = 0; i < points.length - 1; i++) {
@@ -85,8 +106,7 @@ export function getCurveDirection(points) {
 
 export function areSameDirection(source, target) {
   return (
-    getCurveDirection(pairPoints(source)) ===
-    getCurveDirection(pairPoints(target))
+    getFlatCubicAnchorDirection(source) === getFlatCubicAnchorDirection(target)
   );
 }
 
@@ -449,6 +469,8 @@ export function closestIndex(source = [], target = []) {
 
   const dcx = sourceCenter.x - targetCenter.x;
   const dcy = sourceCenter.y - targetCenter.y;
+  // const dcx = source.centerX - target.centerX;
+  // const dcy = source.centerY - target.centerY;
 
   for (let k = 0; k < N; k += 6) {
     let totalDist = 0;
