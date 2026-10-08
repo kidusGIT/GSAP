@@ -464,8 +464,8 @@ export function closestIndex(source = [], target = []) {
   let minDist = Infinity;
   let bestK = 0;
 
-  const sourceCenter = getBoundingCenter(source);
-  const targetCenter = getBoundingCenter(target);
+  const sourceCenter = getCentroid(source);
+  const targetCenter = getCentroid(target);
 
   const dcx = sourceCenter.x - targetCenter.x;
   const dcy = sourceCenter.y - targetCenter.y;

@@ -163,6 +163,7 @@ let gsap,
   _sortBySize = (a, b) => {
     let sizeA = a.size || _getSize(a),
       sizeB = b.size || _getSize(b);
+    // return sizeB - sizeA;
     return Math.abs(sizeB - sizeA) < (sizeA + sizeB) / 20
       ? b.centerX - a.centerX || b.centerY - a.centerY
       : sizeB - sizeA; //if the size is within 10% of each other, prioritize position from left to right, then top to bottom.
@@ -259,12 +260,12 @@ let gsap,
     return [closestX, closestY];
   },
   _getClosestSegment = (
-    bezier,
-    pool,
+    bezier, // short[startIndex]
+    pool, // larger
     startIndex,
     sortRatio,
-    offsetX,
-    offsetY,
+    offsetX, // longer.centerX - shorter.centerX
+    offsetY, // longer.centerY - shorter.centerY
   ) => {
     //matches the bezier to the closest one in a pool (array) of beziers, assuming they are in order of size and we shouldn't drop more than 20% of the size, otherwise prioritizing location (total distance to the center). Extracts the segment out of the pool array and returns it.
     let l = pool.length,
@@ -290,6 +291,7 @@ let gsap,
       dx = pool[i].centerX - cx;
       dy = pool[i].centerY - cy;
       d = _sqrt(dx * dx + dy * dy);
+      // d = dx * dx + dy * dy;
       if (d < min) {
         index = i;
         min = d;
@@ -390,10 +392,21 @@ let gsap,
     if (longer.length > 1) {
       start.sort(sortMethod);
       end.sort(sortMethod);
+
+      // start.forEach((a) => {
+      //   _getSize(a);
+      // });
+      // end.forEach((a) => {
+      //   _getSize(a);
+      // });
+
       offsetX = longer.size || _getTotalSize(longer); //ensures centerX and centerY are defined (used below).
       offsetX = shorter.size || _getTotalSize(shorter);
       offsetX = longer.centerX - shorter.centerX;
       offsetY = longer.centerY - shorter.centerY;
+
+      offsetX = 0;
+      offsetY = 0;
       if (sortMethod === _sortBySize) {
         for (i = 0; i < shorter.length; i++) {
           longer.splice(
@@ -427,15 +440,15 @@ let gsap,
       const cloneShort = [...shorter];
       while (added < dif) {
         // x = longer[i].size || _getSize(longer[i]); //just to ensure centerX and centerY are calculated which we use on the next line.
-        // b = _getClosestAnchor(cloneShort, longer[i].centerX, longer[i].centerY);
-        // x = b[0];
-        // y = b[1];
-        const point = getClosestAnchor(
-          { x: longer[i].centerX, y: longer[i].centerY },
-          cloneShort,
-        );
-        x = point.x;
-        y = point.y;
+        b = _getClosestAnchor(cloneShort, longer[i].centerX, longer[i].centerY);
+        x = b[0];
+        y = b[1];
+        // const point = getClosestAnchor(
+        //   { x: longer[i].centerX, y: longer[i].centerY },
+        //   cloneShort,
+        // );
+        // x = point.x;
+        // y = point.y;
         shorter[i++] = [x, y, x, y, x, y, x, y];
         shorter.totalPoints += 8;
         added++;
@@ -448,20 +461,20 @@ let gsap,
       dif = eb.length - sb.length;
       if (dif < 0) {
         const curveToAdd = (sb.length - 2) / 6;
-        eb = subdividePath(eb, curveToAdd);
-        end[i] = eb;
-        // _subdivideSegmentQty(eb, (-dif / 6) | 0);
+        // eb = subdividePath(eb, curveToAdd);
+        // end[i] = eb;
+        _subdivideSegmentQty(eb, (-dif / 6) | 0);
       } else if (dif > 0) {
         const curveToAdd = (eb.length - 2) / 6;
-        sb = subdividePath(sb, curveToAdd);
-        start[i] = sb;
-        // _subdivideSegmentQty(sb, (dif / 6) | 0);
+        // sb = subdividePath(sb, curveToAdd);
+        // start[i] = sb;
+        _subdivideSegmentQty(sb, (dif / 6) | 0);
         console.log("sb ", sb);
       }
 
-      // if (reverse && fillSafe !== false && !sb.reversed) {
-      //   reverseSegment(sb);
-      // }
+      if (reverse && fillSafe !== false && !sb.reversed) {
+        reverseSegment(sb);
+      }
       shapeIndex =
         shapeIndices[i] || shapeIndices[i] === 0 ? shapeIndices[i] : "auto";
       if (shapeIndex) {
@@ -472,9 +485,9 @@ let gsap,
             Math.abs(sb[1] - sb[sb.length - 1]) < 0.5)
         ) {
           if (shapeIndex === "auto" || shapeIndex === "log") {
-            if (reverse) {
-              reverseSegment(sb);
-            }
+            // if (reverse) {
+            //   reverseSegment(sb);
+            // }
             const sameDirection = areSameDirection(sb, eb);
             if (!i && !sameDirection) {
               reverseSegment(sb);

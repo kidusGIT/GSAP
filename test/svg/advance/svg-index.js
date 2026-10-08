@@ -11,6 +11,7 @@ let tl = gsap
   .to("#morph", { morphSVG: "#speech" })
   .to("#morph", { morphSVG: "#rocket" })
   .to("#morph", { morphSVG: "#lightning" })
+  .to("#morph", { morphSVG: "#mute" })
   .to("#morph", { morphSVG: "#thumb" })
   .to("#morph", { morphSVG: "#square" })
   .to("#morph", { morphSVG: "#grid" })
