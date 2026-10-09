@@ -481,7 +481,7 @@ export function closestIndex(source = [], target = []) {
       const dx = source[index] - (target[i] + dcx);
       const dy = source[index + 1] - (target[i + 1] + dcy);
 
-      totalDist += dx * dx + dy * dy;
+      totalDist += Math.sqrt(dx * dx + dy * dy);
     }
 
     if (totalDist < minDist) {

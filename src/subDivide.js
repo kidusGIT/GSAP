@@ -356,7 +356,7 @@ function getCentroid(flatCoords) {
   };
 }
 
-function cubicBezierArrayToPath(flatArray) {
+export function cubicBezierArrayToPath(flatArray) {
   if (!flatArray || flatArray.length < 8) return "";
 
   // First point (x0, y0) is the start point (Move To)

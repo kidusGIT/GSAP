@@ -10,6 +10,7 @@
 
 import { ArraySVGMorpher, pathString } from "./PolarSVGMorpher.js";
 import {
+  cubicBezierArrayToPath,
   getClosestAnchor,
   isSmoothJoint,
   makeBothPointsSmooth,
@@ -163,6 +164,15 @@ let gsap,
   _sortBySize = (a, b) => {
     let sizeA = a.size || _getSize(a),
       sizeB = b.size || _getSize(b);
+
+    let diff = Math.abs(sizeB - sizeA) / Math.max(sizeA, sizeB);
+
+    if (diff <= 0.05) {
+      return b.centerX - a.centerX || b.centerY - a.centerY;
+    } else {
+      return sizeB - sizeA;
+    }
+
     // return sizeB - sizeA;
     return Math.abs(sizeB - sizeA) < (sizeA + sizeB) / 20
       ? b.centerX - a.centerX || b.centerY - a.centerY
@@ -283,10 +293,19 @@ let gsap,
       dx,
       dy,
       d;
+    const t = bezier.size;
+    const minArea = t * (1 - 0.05);
+
     for (i = startIndex; i < l; i++) {
       size = pool[i].size || _getSize(pool[i]);
+
+      // if (size < minArea) {
+      //   console.log("been here");
+      //   break;
+      // }
+
       if (size < minSize) {
-        break;
+        // break;
       }
       dx = pool[i].centerX - cx;
       dy = pool[i].centerY - cy;
@@ -393,13 +412,6 @@ let gsap,
       start.sort(sortMethod);
       end.sort(sortMethod);
 
-      // start.forEach((a) => {
-      //   _getSize(a);
-      // });
-      // end.forEach((a) => {
-      //   _getSize(a);
-      // });
-
       offsetX = longer.size || _getTotalSize(longer); //ensures centerX and centerY are defined (used below).
       offsetX = shorter.size || _getTotalSize(shorter);
       offsetX = longer.centerX - shorter.centerX;
@@ -485,29 +497,30 @@ let gsap,
             Math.abs(sb[1] - sb[sb.length - 1]) < 0.5)
         ) {
           if (shapeIndex === "auto" || shapeIndex === "log") {
-            // if (reverse) {
+            // if (fillSafe !== false && reverse && !sb.reversed) {
             //   reverseSegment(sb);
             // }
-            const sameDirection = areSameDirection(sb, eb);
-            if (!i && !sameDirection) {
-              reverseSegment(sb);
-              reverse = true;
-            }
-            const index = closestIndex(sb, eb);
-            _offsetSegment(sb, index);
-
-            // shapeIndices[i] = shapeIndex = _getClosestShapeIndex(
-            //   sb,
-            //   eb,
-            //   !i || fillSafe === false,
-            // );
-
-            // if (shapeIndex < 0) {
+            // const sameDirection = areSameDirection(sb, eb);
+            // if (!i && !sameDirection) {
+            //   reverseSegment(sb);
             //   reverse = true;
-            //   reverseSegment(sb);
-            //   shapeIndex = -shapeIndex;
             // }
-            // _offsetSegment(sb, shapeIndex * 6);
+            // const index = closestIndex(sb, eb);
+            // _offsetSegment(sb, index);
+
+            shapeIndices[i] = shapeIndex = _getClosestShapeIndex(
+              sb,
+              eb,
+              !i || fillSafe === false,
+            );
+
+            if (shapeIndex < 0) {
+              reverse = true;
+              reverseSegment(sb);
+              shapeIndex = -shapeIndex;
+            }
+            // const sbStr = cubicBezierArrayToPath();
+            _offsetSegment(sb, shapeIndex * 6);
           } else if (shapeIndex !== "reverse") {
             if (i && shapeIndex < 0) {
               //only happens if an array is passed as shapeIndex and a negative value is defined for an index beyond 0. Very rare, but helpful sometimes.
