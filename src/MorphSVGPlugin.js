@@ -305,7 +305,7 @@ let gsap,
       // }
 
       if (size < minSize) {
-        // break;
+        break;
       }
       dx = pool[i].centerX - cx;
       dy = pool[i].centerY - cy;
@@ -481,7 +481,6 @@ let gsap,
         // sb = subdividePath(sb, curveToAdd);
         // start[i] = sb;
         _subdivideSegmentQty(sb, (dif / 6) | 0);
-        console.log("sb ", sb);
       }
 
       if (reverse && fillSafe !== false && !sb.reversed) {
