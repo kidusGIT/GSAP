@@ -12,11 +12,15 @@ const seek = document.getElementById("btn-seek");
 
 let t;
 
-var values = "100%;40% 60%;20 350;50% 50%;true;10%".split(";"),
-  currentIndex = 0;
+// var values = "100%;40% 60%;20 350;50% 50%;true;10%".split(";"),
+//   currentIndex = 0;
 
 //set the initial value
-gsap.set("#path, #code", { visibility: "visible" });
+let values = ["-70%", "100%", "70%"];
+let currentIndex = 0;
+gsap.set("#rocket, #code", { visibility: "visible" });
+
+const text = document.getElementById("current");
 
 function next() {
   gsap.killTweensOf(next); //in case the user clicks, clear any delayed calls to this method.
@@ -25,35 +29,55 @@ function next() {
   }
   if (values[currentIndex] === "true") {
     gsap.set("#current", { text: values[currentIndex] });
+    text.textContent = values[currentIndex];
   } else {
     gsap.set("#current", { text: '"' + values[currentIndex] + '"' });
+    text.textContent = '"' + values[currentIndex] + '"';
   }
-  gsap.to("#path", {
+  gsap.to("#rocket", {
     drawSVG: values[currentIndex],
     duration: 1,
     ease: "power1.inOut",
   });
 }
 
-document.querySelector("#next").addEventListener("click", next);
+const drawPercentage = ["25% 75%"]; // [ "offset, dash array" ] it offset will be multiplied by -1 internally by DrawSVGPlugin
+let index = 0;
+function draw() {
+  index = (index + 1) % drawPercentage.length;
+  console.log("index ", index);
 
-pause.onclick = () => {
-  t.pause();
-};
+  const length = document.querySelector("#square").getTotalLength();
+  console.log("length ", length);
 
-reverse.onclick = () => {
-  console.log("-----------------------------------");
-  t.reverse();
-};
+  gsap.to("#square", {
+    drawSVG: drawPercentage[index],
+    duration: 1,
+    ease: "power1.inOut",
+  });
+  text.textContent = drawPercentage[index];
+}
 
-play.onclick = () => {
-  t.play();
-};
+// draw()
+document.querySelector("#next").addEventListener("click", draw);
 
-resume.onclick = () => {
-  t.resume();
-};
+// pause.onclick = () => {
+//   t.pause();
+// };
 
-seek.onclick = () => {
-  t.seek(1.5);
-};
+// reverse.onclick = () => {
+//   console.log("-----------------------------------");
+//   t.reverse();
+// };
+
+// play.onclick = () => {
+//   t.play();
+// };
+
+// resume.onclick = () => {
+//   t.resume();
+// };
+
+// seek.onclick = () => {
+//   t.seek(1.5);
+// };

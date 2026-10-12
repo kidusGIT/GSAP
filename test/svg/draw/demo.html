@@ -1,0 +1,63 @@
+<!doctype html>
+<html>
+  <body>
+    <h2>SVG stroke-dasharray attribute</h2>
+    <!--
+    - A dash does appear at 0px in this configuration.
+    - Here is why that happens:
+    - The Pattern: stroke-dasharray="107.5" defines a pattern where the first dash runs from 0 to 107.5, and the first gap runs from 107.5 to 215.
+    - The Offset: stroke-dashoffset="80" tells the browser to start rendering the path at a position of 80 units into that dash pattern.
+    - The Result at 0px: Since 80 is less than 107.5, starting at pattern position 80 puts you inside the middle of the first dash.
+    
+    -->
+
+    <!-- 
+    1. The Pattern Breakdown
+     - stroke-dasharray="107.5": Creates a repeating pattern consisting of a 107.5px dash followed by a 107.5px gap (totaling a 215px full cycle). 
+     - stroke-dashoffset="120.5": Shifts the pattern forward by 120.5 pixels. Because 120.5 is greater than the dash length (107.5) but less than the full cycle (215), it shifts the starting point into the middle of the first gap.
+    2. What Renders on the Path (0px to 215px)
+     - From 0px to 94.5px: Gap. The path starts invisible because the offset lands in the gap section (215 - 120.5 = 94.5).
+     - From 94.5px to 202px: Dash. A full 107.5px visible dash is rendered (94.5 + 107.5 = 202).
+     - From 202px to 215px: Gap. The remaining 13 pixels of the path fall into the next gap 
+     -->
+
+    <svg
+      height="100"
+      width="400"
+      viewBox="0 0 100 100"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <g fill="none" stroke="red" stroke-width="6">
+        <!-- <path
+          id="first-id"
+          stroke-dasharray="107.5"
+          stroke-dashoffset="130.5"
+          d="M5 20 l215 0"
+        />
+        <path stroke-dasharray="10,10" d="M5 40 l215 0" />
+        <path stroke-dasharray="35,10" d="M5 60 l215 0" />
+        <path stroke-dasharray="20,10,5,5,5,10" d="M5 80 l215 0" /> -->
+
+        <!-- 
+        1. You started inside a dash, not a gap: Your stroke-dasharray sets a massive 207.8px dash followed by a 69.39px gap. An offset of 27.7 means the browser jumps 27.7 pixels into that huge 207.8px dash.
+        2. The origin is visible: Because 27.7 is smaller than 207.8, the point M50,1 lands right in the middle of a continuous dash, which is why the line appears solid at the very top vertex.
+        3. Where the gap actually went: The gap doesn't start at the origin; instead, the 207.8px dash runs for most of the shape (207.8 - 27.7 = 180.1 pixels of visible line), and then the 69.39px gap begins further down the path, wrapping around and causing the break you see in the middle of the lines.
+        -->
+
+        <path
+          id="square"
+          stroke-dasharray="50 30"
+          stroke="green"
+          d="M50,1l49,49L50,99L1,50L50,1z"
+        />
+      </g>
+      Sorry, your browser does not support inline SVG.
+    </svg>
+  </body>
+
+  <script>
+    const firstPath = document.getElementById("first-id");
+    firstPath.getTotalLength();
+    console.log(firstPath.getTotalLength());
+  </script>
+</html>
