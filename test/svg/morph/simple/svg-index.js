@@ -1,5 +1,5 @@
-import { gsap } from "../../../src/index.js";
-import { MorphSVGPlugin } from "../../../src/MorphSVGPlugin.js";
+import { gsap } from "../../../../src/index.js";
+import { MorphSVGPlugin } from "../../../../src/MorphSVGPlugin.js";
 
 gsap.registerPlugin(MorphSVGPlugin);
 

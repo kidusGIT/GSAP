@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GSAP SVG</title>
+
+    <style>
+      @font-face {
+        font-display: swap;
+        font-family: Mori;
+        font-weight: 400;
+        src: url(/fonts/Mori/PPMori-Regular.woff) format("woff");
+      }
+      @font-face {
+        font-display: swap;
+        font-family: Mori;
+        font-weight: 600;
+        src: url(/fonts/Mori/PPMori-SemiBold.woff) format("woff");
+      }
+
+      :root {
+        --color-shockingly-green: #0ae448;
+        --color-lt-green: #abff84;
+        --color-just-black: #0e100f;
+        --color-surface-white: #fffce1;
+        --color-surface75: #bbbaa6;
+      }
+
+      body {
+        background-color: #1b1b1d;
+        color: #ccc;
+        text-align: center;
+        padding-top: 1rem;
+        margin: 0;
+        font-family: Mori, system-ui, sans-serif;
+        font-size: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+        line-height: 1.45;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      /* Line */
+      #template,
+      #path {
+        fill: none;
+      }
+
+      #template {
+        stroke-width: 5px;
+        stroke: #444;
+      }
+
+      #path {
+        stroke: url(#orange);
+        stroke-width: 20px;
+        visibility: hidden;
+      }
+
+      #macha stop:first-child {
+        stop-color: var(--color-shockingly-green);
+      }
+      #macha stop:last-child {
+        stop-color: var(--color-lt-green);
+      }
+
+      /* Code readout */
+      #code {
+        font-size: 2rem;
+        font-family: monospace;
+        color: #777;
+        margin: 20px;
+        position: relative;
+        visibility: hidden;
+      }
+
+      #current {
+        display: inline-block;
+        color: white;
+      }
+
+      /* Button */
+      button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5em;
+        min-height: 2.5rem;
+        padding: 0 1.25rem;
+        border: 2px solid var(--color-surface75);
+        border-radius: 99px;
+        background: transparent;
+        color: var(--color-surface75);
+        font:
+          600 0.9rem/1 Mori,
+          system-ui,
+          sans-serif;
+        cursor: pointer;
+        transition:
+          border-color 0.2s,
+          color 0.2s;
+      }
+
+      .container {
+        margin-top: 2rem;
+      }
+
+      button:hover {
+        border-color: var(--color-surface-white);
+        color: var(--color-surface-white);
+      }
+
+      button:focus-visible {
+        outline: none;
+        border-color: var(--color-shockingly-green);
+        box-shadow: 0 0 0 3px rgba(10, 228, 72, 0.35);
+      }
+    </style>
+
+    <script src="./svg-index.js" type="module" defer></script>
+  </head>
+  <body>
+    <div class="btn-wrapper">
+      <!-- <button class="btn" id="btn-start">Start</button> -->
+      <button class="btn" id="btn-play">Play</button>
+      <button class="btn" id="btn-reverse">Reverse</button>
+      <button class="btn" id="btn-pause">Pause</button>
+      <button class="btn" id="btn-resume">Resume</button>
+      <button class="btn" id="btn-seek">Seek</button>
+    </div>
+    <div class="container">
+      <svg
+        version="1.1"
+        xmlns="http://www.w3.org/2000/svg"
+        xmlns:xlink="http://www.w3.org/1999/xlink"
+        width="516.3px"
+        height="190px"
+        viewBox="0 0 516.3 190"
+        style="enable-background: new 0 0 516.3 211.99"
+        xml:space="preserve"
+      >
+        <defs>
+          <linearGradient
+            id="orange"
+            gradientUnits="userSpaceOnUse"
+            x1="23.2"
+            y1="-11.7"
+            x2="493.1"
+            y2="201.7"
+          >
+            <stop offset="19.42%" stop-color="#ff8709" />
+            <stop offset="73.08%" stop-color="#f7bdf8" />
+          </linearGradient>
+        </defs>
+        <path
+          id="template"
+          d="M9.13,99.99c0,0,18.53-41.58,49.91-65.11c30-22.5,65.81-24.88,77.39-24.88c33.87,0,57.55,11.71,77.05,28.47c23.09,19.85,40.33,46.79,61.71,69.77c24.09,25.89,53.44,46.75,102.37,46.75c22.23,0,40.62-2.83,55.84-7.43c27.97-8.45,44.21-22.88,54.78-36.7c14.35-18.75,16.43-36.37,16.43-36.37"
+        />
+        <path
+          id="path"
+          d="M9.13,99.99c0,0,18.53-41.58,49.91-65.11c30-22.5,65.81-24.88,77.39-24.88c33.87,0,57.55,11.71,77.05,28.47c23.09,19.85,40.33,46.79,61.71,69.77c24.09,25.89,53.44,46.75,102.37,46.75c22.23,0,40.62-2.83,55.84-7.43c27.97-8.45,44.21-22.88,54.78-36.7c14.35-18.75,16.43-36.37,16.43-36.37"
+        />
+      </svg>
+
+      <div id="code">
+        drawSVG:
+        <div id="current">"100%"</div>
+      </div>
+      <button id="next">Next Example</button>
+    </div>
+  </body>
+</html>

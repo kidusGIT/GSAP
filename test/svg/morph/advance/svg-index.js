@@ -1,5 +1,5 @@
-import { gsap } from "../../../src/index.js";
-import { MorphSVGPlugin } from "../../../src/MorphSVGPlugin.js";
+import { gsap } from "../../../../src/index.js";
+import { MorphSVGPlugin } from "../../../../src/MorphSVGPlugin.js";
 
 const pause = document.getElementById("btn-pause");
 const reverse = document.getElementById("btn-reverse");
