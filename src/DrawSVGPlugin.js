@@ -349,7 +349,9 @@ export const DrawSVGPlugin = {
 
         style.strokeDashoffset = offsetLerp;
         style.strokeDasharray =
-          dashLerp + "px," + (data._nowrap ? 999999 : gapLerp) + "px";
+          length < 0.1
+            ? "none"
+            : dashLerp + "px," + (data._nowrap ? 999999 : gapLerp) + "px";
       }
     } else {
       data.styles.revert();
