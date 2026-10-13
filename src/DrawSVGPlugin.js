@@ -175,6 +175,43 @@ let gsap,
     }
   };
 
+let drawSVGInfo = {};
+function parsePositionValue(str = "", length) {
+  const num = parseFloat(str);
+  if (str.indexOf("%") !== -1) {
+    return (num / 100) * length;
+  }
+
+  return isNaN(num) ? length : num;
+}
+
+function parseDrawPercentage(value = "", length, target) {
+  const [st, dashArray] = value.split(" ");
+
+  const isZero = dashArray === undefined;
+  const start = isZero ? 0 : parsePositionValue(st, length);
+  const end = dashArray
+    ? parsePositionValue(dashArray, length)
+    : parsePositionValue(st, length);
+
+  const css = window.getComputedStyle(target),
+    dashProps = css.strokeDasharray || "";
+  const prevOffset = parsePositionValue(css.strokeDashoffset || "0", 0);
+
+  const [pDash, pGap] = dashProps.split(",");
+  const prevDash = parsePositionValue(pDash, length);
+  const prevGap = parsePositionValue(pGap, length);
+
+  const s = start / length;
+  const e = end / length;
+
+  const dash = (e - s) * length;
+  const gap = length - dash;
+  const offset = -s * length;
+
+  return { dash, gap, offset, prevDash, prevGap, prevOffset };
+}
+
 export const DrawSVGPlugin = {
   version: "3.13.0",
   name: "drawSVG",
@@ -207,6 +244,7 @@ export const DrawSVGPlugin = {
     } else if ((value + "").indexOf(" ") === -1) {
       value = "0 " + value;
     }
+    drawSVGInfo = parseDrawPercentage(value, length, _toArray(target)[0]);
     start = _getPosition(target, length);
     end = _parse(value, length, start[0]);
     this._length = _round(length);
@@ -276,10 +314,14 @@ export const DrawSVGPlugin = {
             }
           }
         }
+
         while (pt) {
           pt.r(ratio, pt.d);
           pt = pt._next;
         }
+
+        drawSVGInfo;
+
         dash = data._dash || (ratio && ratio !== 1 && 0.0001) || 0; // only let it be zero if it's at the start or end of the tween.
         length = data._length - dash + 0.1;
         offset = data._offset;
@@ -288,13 +330,26 @@ export const DrawSVGPlugin = {
           dash + Math.abs(offset % data._length) > data._length - 0.05 &&
           (offset += offset < 0 ? 0.005 : -0.005) &&
           (length += 0.005);
-        style.strokeDashoffset = dash ? offset : offset + 0.001;
+
+        const dashLerp =
+          drawSVGInfo.prevDash +
+          (drawSVGInfo.dash - drawSVGInfo.prevDash) * ratio;
+        const gapLerp = data._length - dashLerp;
+        const offsetLerp =
+          drawSVGInfo.prevOffset +
+          (drawSVGInfo.offset - drawSVGInfo.prevOffset) * ratio;
+
+        // style.strokeDashoffset = dash ? offset : offset + 0.001;
+        // style.strokeDasharray =
+        //   length < 0.1
+        //     ? "none"
+        //     : dash
+        //       ? dash + "px," + (data._nowrap ? 999999 : length) + "px"
+        //       : "0px, 999999px";
+
+        style.strokeDashoffset = offsetLerp;
         style.strokeDasharray =
-          length < 0.1
-            ? "none"
-            : dash
-              ? dash + "px," + (data._nowrap ? 999999 : length) + "px"
-              : "0px, 999999px";
+          dashLerp + "px," + (data._nowrap ? 999999 : gapLerp) + "px";
       }
     } else {
       data.styles.revert();

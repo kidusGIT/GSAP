@@ -28,7 +28,7 @@
       xmlns="http://www.w3.org/2000/svg"
     >
       <g fill="none" stroke="red" stroke-width="6">
-        <!-- <path
+        <path
           id="first-id"
           stroke-dasharray="107.5"
           stroke-dashoffset="130.5"
@@ -36,7 +36,7 @@
         />
         <path stroke-dasharray="10,10" d="M5 40 l215 0" />
         <path stroke-dasharray="35,10" d="M5 60 l215 0" />
-        <path stroke-dasharray="20,10,5,5,5,10" d="M5 80 l215 0" /> -->
+        <path stroke-dasharray="20,10,5,5,5,10" d="M5 80 l215 0" />
 
         <!-- 
         1. You started inside a dash, not a gap: Your stroke-dasharray sets a massive 207.8px dash followed by a 69.39px gap. An offset of 27.7 means the browser jumps 27.7 pixels into that huge 207.8px dash.
@@ -44,12 +44,12 @@
         3. Where the gap actually went: The gap doesn't start at the origin; instead, the 207.8px dash runs for most of the shape (207.8 - 27.7 = 180.1 pixels of visible line), and then the 69.39px gap begins further down the path, wrapping around and causing the break you see in the middle of the lines.
         -->
 
-        <path
+        <!-- <path
           id="square"
           stroke-dasharray="50 30"
           stroke="green"
           d="M50,1l49,49L50,99L1,50L50,1z"
-        />
+        /> -->
       </g>
       Sorry, your browser does not support inline SVG.
     </svg>
