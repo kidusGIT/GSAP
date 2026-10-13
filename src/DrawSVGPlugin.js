@@ -220,8 +220,9 @@ function parseDrawPercentage(value = "", length, target) {
 
   const [pDash, pGap] = dashProps.split(",");
   const prevDash = parsePositionValue(pDash, length);
-  const prevGap = parsePositionValue(pGap, length);
+  const prevGap = parsePositionValue(pGap, 0);
 
+  drawSVGInfo.isRendered = true;
   const s = start / length;
   const e = end / length;
 
@@ -229,6 +230,15 @@ function parseDrawPercentage(value = "", length, target) {
   const gap = length - dash;
   const offset = -s * length;
 
+  drawSVGInfo = {
+    isRendered: true,
+    dash,
+    gap,
+    offset,
+    prevDash,
+    prevGap,
+    prevOffset,
+  };
   return { dash, gap, offset, prevDash, prevGap, prevOffset };
 }
 
@@ -264,7 +274,7 @@ export const DrawSVGPlugin = {
     } else if ((value + "").indexOf(" ") === -1) {
       value = "0 " + value;
     }
-    drawSVGInfo = parseDrawPercentage(value, length, _toArray(target)[0]);
+    parseDrawPercentage(value, length, _toArray(target)[0]);
     start = _getPosition(target, length);
     end = _parse(value, length, start[0]);
     this._length = _round(length);
@@ -339,8 +349,7 @@ export const DrawSVGPlugin = {
           pt.r(ratio, pt.d);
           pt = pt._next;
         }
-
-        drawSVGInfo;
+        drawSVGInfo.isRendered = true;
 
         dash = data._dash || (ratio && ratio !== 1 && 0.0001) || 0; // only let it be zero if it's at the start or end of the tween.
         length = data._length - dash + 0.1;
@@ -354,7 +363,7 @@ export const DrawSVGPlugin = {
         const dashLerp =
           drawSVGInfo.prevDash +
           (drawSVGInfo.dash - drawSVGInfo.prevDash) * ratio;
-        const gapLerp = data._length - dashLerp;
+        const gapLerp = data._length - dashLerp + 0.1;
         const offsetLerp =
           drawSVGInfo.prevOffset +
           (drawSVGInfo.offset - drawSVGInfo.prevOffset) * ratio;
