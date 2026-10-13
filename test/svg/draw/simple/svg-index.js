@@ -34,30 +34,30 @@ function next() {
     gsap.set("#current", { text: '"' + values[currentIndex] + '"' });
     text.textContent = '"' + values[currentIndex] + '"';
   }
-  gsap.to("#rocket", {
+  gsap.to("#square", {
     drawSVG: values[currentIndex],
     duration: 1,
     ease: "power1.inOut",
   });
 }
 
-gsap.from("#rocket", {
-  drawSVG: "25% 90%",
-  duration: 1,
-  ease: "power1.inOut",
-});
+// gsap.from("#square", {
+//   drawSVG: "25% 90%",
+//   duration: 1,
+//   ease: "power1.inOut",
+// });
 
-const drawPercentage = ["10% 75%", "25% 90%", "100%"]; // [ "offset, dash array" ] it offset will be multiplied by -1 internally by DrawSVGPlugin
+const drawPercentage = ["25% 90%", "10% 75%", "100%"]; // [ "offset, dash array" ] it offset will be multiplied by -1 internally by DrawSVGPlugin
 
 let index = 0;
 function draw() {
   index = (index + 1) % drawPercentage.length;
   console.log("index ", index);
 
-  const el = document.querySelector("#rocket");
+  const el = document.querySelector("#square");
   const length = el.getTotalLength();
 
-  gsap.to("#rocket", {
+  gsap.to("#square", {
     drawSVG: drawPercentage[index],
     duration: 1,
     ease: "power1.inOut",

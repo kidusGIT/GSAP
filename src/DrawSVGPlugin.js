@@ -81,6 +81,26 @@ let gsap,
     if (_hasNonScalingStroke(target)) {
       //non-scaling-stroke basically scales the shape and then strokes it at the screen-level (after transforms), thus we need to adjust the length accordingly.
       scaleY = target.getScreenCTM();
+      /**
+      target.getScreenCTM() Returns a Matrix: It gives you a DOMMatrix (with values like a, b, c, d, e, f) representing scale(a, b), rotation(c, d), and translation(e, f) relative to the screen/viewport.
+
+
+        Matrix Property,	Purpose if Not Rotated,	      Purpose if Rotated
+        a	                - Horizontal Scale (scaleX)	  - Combines Horizontal Scale & Cosine of Angle
+        b	                - 0	                          - Combines Horizontal Scale & Sine of Angle
+        c	                - 0                           -	Combines Vertical Scale & Sine of Angle
+        d	                - Vertical Scale (scaleY)	    - Combines Vertical Scale & Cosine of Angle
+        e	                - X Translation (always)	    - X Translation (always)
+        f	                - Y Translation (always)	    - Y Translation (always)
+
+        • a: scaleX * cos(angle)
+        • b: scaleX * sin(angle)
+        • c: -scaleY * sin(angle)
+        • d: scaleY * cos(angle)
+        • e: Controls the horizontal translation (X-axis movement).
+        • f: Controls the vertical translation (Y-axis movement).
+
+      */
       scaleX = _sqrt(scaleY.a * scaleY.a + scaleY.b * scaleY.b);
       scaleY = _sqrt(scaleY.d * scaleY.d + scaleY.c * scaleY.c);
     }
@@ -353,7 +373,7 @@ export const DrawSVGPlugin = {
             ? "none"
             : dashLerp
               ? dashLerp + "px," + (data._nowrap ? 999999 : gapLerp) + "px"
-              : "0px, 999999px";
+              : "none";
       }
     } else {
       data.styles.revert();
