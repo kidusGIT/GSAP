@@ -138,6 +138,37 @@
         viewBox="0 0 100 100"
         fill="none"
       >
+        <line
+          id="test-line"
+          x1="10"
+          y1="20"
+          x2="90"
+          y2="20"
+          stroke="crimson"
+          vector-effect="non-scaling-stroke"
+          stroke-width="2"
+        />
+
+        <!-- 2. Polyline (Zig-zag, Length = 100) -->
+        <!-- Made of two perfect 3:4:5 right triangles. Total length: 50 + 50 = 100 -->
+        <polyline
+          id="test-polyline"
+          points="10,50 40,90 70,50"
+          fill="none"
+          stroke="dodgerblue"
+          stroke-width="2"
+        />
+
+        <!-- 3. Polygon (Right Triangle, Length = 120) -->
+        <!-- Base = 40, Height = 30, Hypotenuse = 50. Total length: 40 + 30 + 50 = 120 -->
+        <polygon
+          id="test-polygon"
+          points="20,60 60,60 60,30"
+          fill="none"
+          stroke="forestgreen"
+          stroke-width="2"
+        />
+
         <path
           id="lightning"
           fill="transparent"
@@ -157,9 +188,24 @@
           d="M 1,1 l 49, 0 l 0 49 l -49, 0 l 0 -49 z"
         /> -->
 
-        <rect id="square" stroke="green" x="1" y="1" width="49" height="49" />
+        <!-- <rect
+          id="square"
+          vector-effect="non-scaling-stroke"
+          stroke="green"
+          x="1"
+          y="1"
+          width="49"
+          height="49"
+        />
 
-        <circle id="circle" stroke="#ff0022" cx="50" cy="50" r="25" />
+        <circle
+          id="circle"
+          vector-effect="non-scaling-stroke"
+          stroke="#ff0022"
+          cx="50"
+          cy="50"
+          r="25"
+        /> -->
 
         <path
           id="grid"

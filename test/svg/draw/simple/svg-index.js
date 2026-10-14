@@ -54,11 +54,17 @@ function draw() {
   index = (index + 1) % drawPercentage.length;
   console.log("index ", index);
 
-  gsap.to("#circle", {
+  gsap.to("#test-polygon", {
     drawSVG: drawPercentage[index],
     duration: 1,
     ease: "power1.inOut",
   });
+
+  // gsap.to("#square", {
+  //   drawSVG: drawPercentage[index],
+  //   duration: 1,
+  //   ease: "power1.inOut",
+  // });
   text.textContent = drawPercentage[index];
 }
 

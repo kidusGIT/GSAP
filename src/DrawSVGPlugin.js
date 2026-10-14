@@ -8,6 +8,40 @@
  */
 /* eslint-disable */
 
+const getScaleFactor = (el) => {
+  let scaleFactor = 1;
+  if (el && el.getCTM) {
+    const ctm = el.getCTM();
+    if (ctm) {
+      const scaleX = _sqrt(ctm.a * ctm.a + ctm.b * ctm.b);
+      const scaleY = _sqrt(ctm.c * ctm.c + ctm.d * ctm.d);
+      scaleFactor = (scaleX + scaleY) / 2;
+    }
+  }
+  return scaleFactor;
+};
+
+function getLength(target) {
+  const type = target.tagName.toLowerCase(),
+    scaleFactor = _hasNonScalingStroke(target) ? getScaleFactor(target) : 1,
+    { width, height } = target.getBBox();
+
+  let length = 0;
+
+  if (type === "rect") {
+    length = width * 2 + height * 2;
+  } else if (type === "circle" || type === "ellipse") {
+    const x = width / 2;
+    const y = height / 2;
+
+    length = Math.PI * (3 * (x + y) - _sqrt((3 * x + y) * (x + 3 * y)));
+  } else {
+    length = target.getTotalLength() || 0;
+  }
+
+  return length * scaleFactor || 0;
+}
+
 let gsap,
   _toArray,
   _doc,
@@ -77,6 +111,7 @@ let gsap,
       prevPoint,
       i,
       rx,
+      sf = 1,
       ry;
     if (_hasNonScalingStroke(target)) {
       //non-scaling-stroke basically scales the shape and then strokes it at the screen-level (after transforms), thus we need to adjust the length accordingly.
@@ -103,6 +138,11 @@ let gsap,
       */
       scaleX = _sqrt(scaleY.a * scaleY.a + scaleY.b * scaleY.b);
       scaleY = _sqrt(scaleY.d * scaleY.d + scaleY.c * scaleY.c);
+
+      sf = (scaleX + scaleY) / 2;
+
+      // scaleX = 1;
+      // scaleY = 1;
     }
     try {
       //IE bug: calling <path>.getTotalLength() locks the repaint area of the stroke to whatever its current dimensions are on that frame/tick. To work around that, we must call getBBox() to force IE to recalculate things.
@@ -114,6 +154,7 @@ let gsap,
       );
     }
     let { x, y, width, height } = bbox || { x: 0, y: 0, width: 0, height: 0 };
+
     if ((!bbox || (!width && !height)) && _types[type]) {
       //if the element isn't visible, try to discern width/height using its attributes.
       width = _getAttributeAsNumber(target, _types[type][0]);
@@ -130,6 +171,7 @@ let gsap,
         height = Math.abs(height - y);
       }
     }
+
     if (type === "path") {
       prevPoint = style.strokeDasharray;
       //   style.strokeDasharray = "none";
@@ -164,6 +206,13 @@ let gsap,
     } else if (type === "circle" || type === "ellipse") {
       rx = (width / 2) * scaleX;
       ry = (height / 2) * scaleY;
+
+      const x = width / 2;
+      const y = height / 2;
+
+      const unscaledLength =
+        Math.PI * (3 * (x + y) - _sqrt((3 * x + y) * (x + 3 * y))) * sf;
+
       length = Math.PI * (3 * (rx + ry) - _sqrt((3 * rx + ry) * (rx + 3 * ry)));
     }
     return length || 0;
@@ -205,8 +254,10 @@ function parsePositionValue(str = "", length) {
   return isNaN(num) ? length : num;
 }
 
-function parseDrawPercentage(value = "", length, target) {
+function parseDrawPercentage(value = "", target) {
   const [st, dashArray] = value.split(" ");
+
+  const length = getLength(target);
 
   const isZero = dashArray === undefined;
   const start = isZero ? 0 : parsePositionValue(st, length);
@@ -223,6 +274,7 @@ function parseDrawPercentage(value = "", length, target) {
   const prevGap = parsePositionValue(pGap, 0);
 
   drawSVGInfo.isRendered = true;
+
   const s = start / length;
   const e = end / length;
 
@@ -274,7 +326,7 @@ export const DrawSVGPlugin = {
     } else if ((value + "").indexOf(" ") === -1) {
       value = "0 " + value;
     }
-    parseDrawPercentage(value, length, _toArray(target)[0]);
+    parseDrawPercentage(value, _toArray(target)[0]);
     start = _getPosition(target, length);
     end = _parse(value, length, start[0]);
     this._length = _round(length);
@@ -351,6 +403,7 @@ export const DrawSVGPlugin = {
         }
         drawSVGInfo.isRendered = true;
 
+        data._length;
         dash = data._dash || (ratio && ratio !== 1 && 0.0001) || 0; // only let it be zero if it's at the start or end of the tween.
         length = data._length - dash + 0.1;
         offset = data._offset;
@@ -360,14 +413,6 @@ export const DrawSVGPlugin = {
           (offset += offset < 0 ? 0.005 : -0.005) &&
           (length += 0.005);
 
-        const dashLerp =
-          drawSVGInfo.prevDash +
-          (drawSVGInfo.dash - drawSVGInfo.prevDash) * ratio;
-        const gapLerp = data._length - dashLerp + 0.1;
-        const offsetLerp =
-          drawSVGInfo.prevOffset +
-          (drawSVGInfo.offset - drawSVGInfo.prevOffset) * ratio;
-
         // style.strokeDashoffset = dash ? offset : offset + 0.001;
         // style.strokeDasharray =
         //   length < 0.1
@@ -375,6 +420,14 @@ export const DrawSVGPlugin = {
         //     : dash
         //       ? dash + "px," + (data._nowrap ? 999999 : length) + "px"
         //       : "0px, 999999px";
+
+        const dashLerp =
+          drawSVGInfo.prevDash +
+          (drawSVGInfo.dash - drawSVGInfo.prevDash) * ratio;
+        const gapLerp = data._length - dashLerp + 0.1;
+        const offsetLerp =
+          drawSVGInfo.prevOffset +
+          (drawSVGInfo.offset - drawSVGInfo.prevOffset) * ratio;
 
         style.strokeDashoffset = offsetLerp;
         style.strokeDasharray =
