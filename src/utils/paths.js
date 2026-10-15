@@ -772,6 +772,7 @@ export function getPositionOnPath(rawPath, progress, includeAngle, point) {
       a,
   );
   if (includeAngle) {
+    // this calculates rotation angle of the tangent to the path at the given progress.
     result.angle = segment.totalLength
       ? getRotationAtBezierT(segment, i, t >= 1 ? 1 - 1e-9 : t ? t : 1e-9)
       : segment.angle || 0;

@@ -11,7 +11,7 @@ const seek = document.getElementById("btn-seek");
 
 let t;
 
-t = gsap.to("#div", {
+t = gsap.to("#rect", {
   duration: 5,
   repeat: 12,
   yoyo: true,
@@ -19,7 +19,7 @@ t = gsap.to("#div", {
   motionPath: {
     path: "#path",
     align: "#path",
-    autoRotate: true,
+    // autoRotate: true,
     alignOrigin: [0.5, 0.5],
   },
 });
