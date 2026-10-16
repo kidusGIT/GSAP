@@ -387,6 +387,7 @@ export const MotionPathPlugin = {
         pt.set(pt.t, pt.p, pt.path[pt.pp] + pt.u, pt.d, ratio);
         pt = pt._next;
       }
+      // this is where the rotation is applied based on the calculated angle.
       data.rotate &&
         data.rSet(
           data.target,

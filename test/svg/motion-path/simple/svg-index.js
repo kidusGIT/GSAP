@@ -19,7 +19,7 @@ t = gsap.to("#rect", {
   motionPath: {
     path: "#path",
     align: "#path",
-    // autoRotate: true,
+    autoRotate: true,
     alignOrigin: [0.5, 0.5],
   },
 });
