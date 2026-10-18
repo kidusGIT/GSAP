@@ -12,9 +12,9 @@ const seek = document.getElementById("btn-seek");
 let t;
 
 t = gsap.to("#rect", {
-  duration: 5,
-  repeat: 12,
-  yoyo: true,
+  duration: 2,
+  // repeat: 12,
+  // yoyo: true,
   ease: "power1.inOut",
   motionPath: {
     path: "#path",

@@ -1,26 +1,6 @@
 /* GSAP brand: fonts, type sizes, colour vars, buttons and form controls.
    Element selectors only, so a demo's own class-based styles still win. */
 
-/* Fonts */
-@font-face {
-  font-display: swap;
-  font-family: Mori;
-  font-weight: 400;
-  src: url(/fonts/Mori/PPMori-Regular.woff) format("woff");
-}
-@font-face {
-  font-display: swap;
-  font-family: Mori;
-  font-weight: 600;
-  src: url(/fonts/Mori/PPMori-SemiBold.woff) format("woff");
-}
-@font-face {
-  font-display: swap;
-  font-family: "Fraktion Mono";
-  font-weight: 400;
-  src: url(/fonts/Fraktion/PPFraktionMono-Bold.woff) format("woff");
-}
-
 /* Colours */
 :root {
   --color-shockingly-green: #0ae448;
@@ -275,28 +255,32 @@ path {
 
 /* SVG rect: orange gradient */
 #rect rect {
-  fill: url(#orange-crush);
+  /* fill: url(#orange-crush); */
+  stroke: var(--color-surface50);
+  fill: none;
   rx: 8px;
 }
 
 #rect text {
   pointer-events: none;
-  fill: var(--color-just-black);
+  /* fill: var(--color-just-black); */
   font-family: Mori, system-ui, sans-serif;
   font-weight: 600;
 }
 
 /* DIV: green gradient */
 #div {
-  position: absolute;
+  /* position: absolute; */
   top: 30%;
   left: 60%;
   width: 120px;
   height: 60px;
   pointer-events: none;
-  background: var(--gradient-macha);
+  /* background: var(--gradient-macha); */
+  border: green solid 4px;
+  color: white;
   border-radius: 12px;
-  color: var(--color-just-black);
+  /* color: var(--color-just-black); */
   font-size: 32px;
   font-weight: 600;
   line-height: 60px;

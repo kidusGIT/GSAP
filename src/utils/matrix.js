@@ -192,6 +192,8 @@ let _doc,
       x,
       y,
       cs;
+
+    console.log("element ", element);
     if (element === _win) {
       return element;
     }
@@ -394,7 +396,8 @@ export function getGlobalMatrix(
       b1.left + (isFixed ? 0 : _getDocScrollLeft()),
       b1.top + (isFixed ? 0 : _getDocScrollTop()),
     );
-  parent.removeChild(container);
+
+  // parent.removeChild(container);
   if (zeroScales) {
     b1 = zeroScales.length;
     while (b1--) {

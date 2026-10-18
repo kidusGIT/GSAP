@@ -199,6 +199,7 @@ let _xProps = "x,translateX,left,marginLeft,xPercent".split(","),
           ];
         }
         m = _getAlignMatrix(target, alignTarget, alignOrigin, "auto");
+        console.log("target ", target.getBoundingClientRect());
         p = m.apply({ x: x, y: y });
         transformRawPath(
           rawPath,
