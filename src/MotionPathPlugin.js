@@ -257,6 +257,54 @@ let _xProps = "x,translateX,left,marginLeft,xPercent".split(","),
   _sliceModifier = (start, end) => (rawPath) =>
     start || end !== 1 ? sliceRawPath(rawPath, start, end) : rawPath;
 
+let pathElTarget, group, alignX, alignY, autoRotateG, box;
+
+function placeShapeAlongPath(path, group, t, options = {}) {
+  // 1. Set default options (center aligned, auto-rotate enabled)
+  const alignX = options.alignX !== undefined ? options.alignX : 0; // 0 = left, 0 = center, 1 = right
+  const alignY = options.alignY !== undefined ? options.alignY : 0; // 0 = top, 0 = center, 1 = bottom
+  const autoRotate =
+    options.autoRotate !== undefined ? options.autoRotate : true;
+
+  // 2. Get path length and target point at fraction t (0 to 1)
+  const totalLength = path.getTotalLength();
+  const currentDist = t * totalLength;
+  const target = path.getPointAtLength(currentDist);
+
+  // 3. Compute rotation angle (theta) if autoRotate is true
+  let theta = 0;
+  if (autoRotate) {
+    const delta = 1;
+    const d1 = Math.max(0, currentDist - delta);
+    const d2 = Math.min(totalLength, currentDist + delta);
+    const p1 = path.getPointAtLength(d1);
+    const p2 = path.getPointAtLength(d2);
+    theta = Math.atan2(p2.y - p1.y, p2.x - p1.x);
+  }
+
+  // 4. Get dynamic bounding box dimensions of the shape
+  const box = options.box || group.getBBox();
+  const localX = box.width * alignX;
+  const localY = box.height * alignY;
+
+  // const localX = 0 + box.width * alignX;
+  // const localY = 0 + box.height * alignY;
+
+  // 5. Compute affine matrix components
+  const cos = Math.cos(theta);
+  const sin = Math.sin(theta);
+
+  // Matrix translation accounting for custom anchor point offsets & rotation
+  const e = target.x - cos * localX + sin * localY;
+  const f = target.y - sin * localX - cos * localY;
+
+  // 6. Apply the transformation matrix
+  group.setAttribute(
+    "transform",
+    `matrix(${cos}, ${sin}, ${-sin}, ${cos}, ${e}, ${f})`,
+  );
+}
+
 export const MotionPathPlugin = {
   version: "3.13.0",
   name: "motionPath",
@@ -294,6 +342,14 @@ export const MotionPathPlugin = {
       this.rSet = target._gsap.set(target, this.rProp, this); // rotation setter
       this.ru = _getUnit(target._gsap.get(target, this.rProp)) || 0; // rotation units
     }
+
+    group = target;
+    pathElTarget = _toArray(path)[0];
+    alignX = vars?.alignOrigin ? vars.alignOrigin[0] || 0 : 0;
+    alignY = vars?.alignOrigin ? vars.alignOrigin[1] || 1 : 1;
+    autoRotateG = autoRotate ? autoRotate : false;
+    box = group.getBBox();
+
     if (
       Array.isArray(path) &&
       !("closed" in path) &&
@@ -371,6 +427,14 @@ export const MotionPathPlugin = {
     tween.vars.immediateRender && this.render(tween.progress(), this);
   },
   render(ratio, data) {
+    // placeShapeAlongPath(pathElTarget, group, ratio, {
+    //   alignX: alignX,
+    //   alignY: alignY,
+    //   autoRotate: autoRotateG,
+    //   box: box,
+    // });
+    // return;
+
     let rawPaths = data.rawPaths,
       i = rawPaths.length,
       pt = data._pt;
