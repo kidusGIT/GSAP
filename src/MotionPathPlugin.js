@@ -348,7 +348,7 @@ export const MotionPathPlugin = {
     alignX = vars?.alignOrigin ? vars.alignOrigin[0] || 0 : 0;
     alignY = vars?.alignOrigin ? vars.alignOrigin[1] || 1 : 1;
     autoRotateG = autoRotate ? autoRotate : false;
-    box = group.getBBox();
+    // box = group.getBBox();
 
     if (
       Array.isArray(path) &&

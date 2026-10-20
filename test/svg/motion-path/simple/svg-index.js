@@ -14,15 +14,7 @@ let t;
 const path = document.getElementById("path");
 const group = document.getElementById("rect-2");
 
-let globalPathEl;
-
 /**
- * Places an SVG motion wrapper along an SVG path.
- *
- * The wrapper's transform is owned by this function.
- * Keep the animated shape inside the wrapper so its original
- * transform and styling remain intact.
- *
  * @param {SVGGeometryElement} path
  * @param {SVGGElement} wrapper
  * @param {number} t - Progress from 0 to 1
@@ -44,9 +36,7 @@ function placeShapeAlongPath(path, wrapper, t, options = {}) {
     !path ||
     typeof path.getTotalLength !== "function" ||
     typeof path.getPointAtLength !== "function" ||
-    !wrapper ||
-    typeof wrapper.getBBox !== "function" ||
-    typeof wrapper.setAttribute !== "function"
+    !wrapper
   ) {
     throw new TypeError(
       "Expected an SVG geometry path and an SVG motion wrapper.",
@@ -78,6 +68,7 @@ function placeShapeAlongPath(path, wrapper, t, options = {}) {
   if (!Number.isFinite(totalLength) || totalLength <= 0) {
     return false;
   }
+  const isSvg = wrapper instanceof SVGGElement;
 
   const progress = Math.max(0, Math.min(1, t));
   const distance = progress * totalLength;
@@ -85,16 +76,22 @@ function placeShapeAlongPath(path, wrapper, t, options = {}) {
   // 3. Resolve coordinate systems
   const parent = wrapper.parentElement;
   const pathCTM = path.getScreenCTM();
-  const parentCTM = parent?.getScreenCTM();
+  const parentCTM = isSvg ? parent?.getScreenCTM() : null;
 
-  if (!pathCTM || !parentCTM) {
+  if (!pathCTM || (isSvg && !parentCTM)) {
     return false;
   }
 
   let screenToParent;
 
   try {
-    screenToParent = parentCTM.inverse();
+    let ctm = parentCTM;
+    if (!isSvg || !ctm) {
+      const style = window.getComputedStyle(parent);
+      const transform = style.transform;
+      ctm = new DOMMatrix(transform);
+    }
+    screenToParent = ctm.inverse();
   } catch {
     // A singular transform cannot be inverted.
     return false;
@@ -142,7 +139,9 @@ function placeShapeAlongPath(path, wrapper, t, options = {}) {
   theta += rotationOffset;
 
   // 6. Get wrapper-local bounds
-  const bounds = box ?? wrapper.getBBox();
+  const bounds = isSvg
+    ? (box ?? wrapper.getBBox())
+    : wrapper.getBoundingClientRect();
 
   if (
     !bounds ||
@@ -163,23 +162,79 @@ function placeShapeAlongPath(path, wrapper, t, options = {}) {
   const f = target.y - sin * localX - cos * localY;
 
   // 8. Apply the motion transform to the wrapper.
-  wrapper.setAttribute(
-    "transform",
-    `matrix(${cos}, ${sin}, ${-sin}, ${cos}, ${e}, ${f})`,
-  );
+
+  if (!isSvg) {
+    wrapper.style.transform = `translate(${0}px, ${f}px)`;
+  } else {
+    wrapper.setAttribute(
+      "transform",
+      `matrix(${cos}, ${sin}, ${-sin}, ${cos}, ${e}, ${f})`,
+    );
+  }
 
   return true;
 }
 
-path.getScreenCTM();
-placeShapeAlongPath(path, group, 0.45, {
-  alignX: 0.5,
-  alignY: 0.5,
-  box: group.getBBox(),
-  autoRotate: true,
-});
+function positionDivAlongPath(path, div, progress = 0.5) {
+  const pathLength = path.getTotalLength();
+  const currentLength = pathLength * progress;
 
-t = gsap.to("#rect", {
+  // 1. Get the target point
+  const point = path.getPointAtLength(currentLength);
+
+  // 2. Get a second point slightly ahead (e.g., 1 pixel) to calculate the tangent angle
+  const nextPoint = path.getPointAtLength(
+    Math.min(pathLength, currentLength + 1),
+  );
+
+  // Calculate the angle in degrees
+  const radians = Math.atan2(nextPoint.y - point.y, nextPoint.x - point.x);
+  const angle = radians * (180 / Math.PI);
+
+  // 3. Transform point to screen coordinates
+  const svgPoint = svg.createSVGPoint();
+  svgPoint.x = point.x;
+  svgPoint.y = point.y;
+  const screenPoint = svgPoint.matrixTransform(svg.getScreenCTM());
+
+  // 4. Calculate container-relative position
+  const container = div.parentElement;
+  const containerRect = container.getBoundingClientRect();
+  const x = screenPoint.x - containerRect.left;
+  const y = screenPoint.y - containerRect.top;
+
+  div.style.transform = `translate(${x}px, ${y}px) rotate(${angle}deg) `;
+}
+
+// positionDivAlongPath(
+//   document.getElementById("path"),
+//   document.getElementById("div"),
+//   0.5,
+// );
+
+// placeShapeAlongPath(path, group, 0.45, {
+//   alignX: 0.5,
+//   alignY: 0.5,
+//   // box: group.getBBox(),
+//   autoRotate: true,
+// });
+
+// window.addEventListener("load", () =>
+//   positionDivAlongPath(
+//     document.getElementById("path"),
+//     document.getElementById("div"),
+//     0.5,
+//   ),
+// );
+// window.addEventListener("resize", () =>
+//   positionDivAlongPath(
+//     document.getElementById("path"),
+//     document.getElementById("div"),
+//     0.5,
+//   ),
+// );
+
+t = gsap.to("#div", {
   duration: 5,
   // repeat: 3,
   // yoyo: true,
