@@ -80,10 +80,46 @@
       console.log("blue bounding ", blueRect);
 
       //   blueDiv.style.transform = "translate(-276px, 0)";
+      // el point (x, y)
 
-      const deltaX = redRect.left - blueRect.left;
-      const deltaY = redRect.top - blueRect.top;
-      blueDiv.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
+      // dif = abs(target position - element position)
+      // el.x > x
+      // x - el.x
+
+      // else
+      // el.x <= x
+      // el.x + el.x
+
+      // target position is > swap position
+      // swap position - target position
+
+      function alignAtPoint(el, x, y) {
+        const rect = el.getBoundingClientRect();
+        const deltaX = Math.abs(x - rect.left);
+        const deltaY = Math.abs(y - rect.top);
+
+        const rectX = rect.x;
+        const rectY = rect.y;
+
+        let dx = 0,
+          dy = 0;
+
+        if (rectX > x) {
+          dx = deltaX - rectX;
+        } else if (rectX < x) {
+          dx = rectX + deltaX;
+        }
+
+        if (rectY > y) {
+          dy = deltaY - rectY;
+        } else if (rectY < y) {
+          dy = rectY + deltaY;
+        }
+
+        el.style.transform = `translate(${dx}px, ${dy}px)`;
+      }
+
+      alignAtPoint(blueDiv, redRect.left, redRect.top);
     </script>
   </body>
 </html>
