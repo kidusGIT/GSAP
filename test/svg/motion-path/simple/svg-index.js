@@ -206,36 +206,41 @@ function positionDivAlongPath(path, div, progress = 0.5) {
   div.style.transform = `translate(${x}px, ${y}px) rotate(${angle}deg) `;
 }
 
-// positionDivAlongPath(
-//   document.getElementById("path"),
-//   document.getElementById("div"),
-//   0.5,
-// );
+function alignAtPoint(svg, div, svgX, svgY) {
+  // 1. Get the actual rendered size of the SVG on screen
+  const rect = svg.getBoundingClientRect();
+  const viewBox = svg.viewBox.baseVal; // x: -20, y: 0, width: 557, height: 190
 
-// placeShapeAlongPath(path, group, 0.45, {
-//   alignX: 0.5,
-//   alignY: 0.5,
-//   // box: group.getBBox(),
-//   autoRotate: true,
-// });
+  const container = div.parentElement;
+  const bounds = container.getBoundingClientRect();
 
-// window.addEventListener("load", () =>
-//   positionDivAlongPath(
-//     document.getElementById("path"),
-//     document.getElementById("div"),
-//     0.5,
-//   ),
-// );
-// window.addEventListener("resize", () =>
-//   positionDivAlongPath(
-//     document.getElementById("path"),
-//     document.getElementById("div"),
-//     0.5,
-//   ),
-// );
+  // 2. Calculate uniform scale (SVG default is "xMidYMid meet")
+  const scaleX = rect.width / viewBox.width;
+  const scaleY = rect.height / viewBox.height;
+  const scale = Math.min(scaleX, scaleY);
 
-t = gsap.to("#div", {
-  duration: 5,
+  // 3. Calculate centering offsets (pillarboxing/letterboxing)
+  const scaledWidth = viewBox.width * scale;
+  const scaledHeight = viewBox.height * scale;
+  const offsetX = (rect.width - scaledWidth) / 2;
+  const offsetY = (rect.height - scaledHeight) / 2;
+
+  // 4. Map the SVG coordinate to local pixel coordinates inside the SVG
+  const pixelX = offsetX + (svgX - viewBox.x) * scale;
+  const pixelY = offsetY + (svgY - viewBox.y) * scale;
+
+  // 5. Position the div relative to the container
+  // div.style.position = "absolute";
+  // div.style.left = `${pixelX}px`;
+  // div.style.top = `${pixelY}px`;
+
+  // Center the div anchor point directly on the coordinate
+  // div.style.transform = `translate(${pixelX}px, ${pixelY}px)`;
+}
+// alignAtPoint(path.parentElement, document.getElementById("div"), 504.48, 74.5);
+
+t = gsap.to("#rect", {
+  duration: 10,
   // repeat: 3,
   // yoyo: true,
   ease: "power1.inOut",

@@ -257,7 +257,13 @@ let _xProps = "x,translateX,left,marginLeft,xPercent".split(","),
   _sliceModifier = (start, end) => (rawPath) =>
     start || end !== 1 ? sliceRawPath(rawPath, start, end) : rawPath;
 
-let pathElTarget, group, alignX, alignY, autoRotateG, box;
+let pathElTarget,
+  group,
+  alignX,
+  alignY,
+  autoRotateG,
+  box,
+  totalLength = 0;
 
 function placeShapeAlongPath(path, group, t, options = {}) {
   // 1. Set default options (center aligned, auto-rotate enabled)
@@ -267,13 +273,14 @@ function placeShapeAlongPath(path, group, t, options = {}) {
     options.autoRotate !== undefined ? options.autoRotate : true;
 
   // 2. Get path length and target point at fraction t (0 to 1)
-  const totalLength = path.getTotalLength();
+  // const totalLength = path.getTotalLength();
   const currentDist = t * totalLength;
   const target = path.getPointAtLength(currentDist);
 
   // 3. Compute rotation angle (theta) if autoRotate is true
   let theta = 0;
-  if (autoRotate) {
+  const box = options.box || group.getBBox();
+  if (autoRotate && box.width !== box.height) {
     const delta = 1;
     const d1 = Math.max(0, currentDist - delta);
     const d2 = Math.min(totalLength, currentDist + delta);
@@ -283,7 +290,7 @@ function placeShapeAlongPath(path, group, t, options = {}) {
   }
 
   // 4. Get dynamic bounding box dimensions of the shape
-  const box = options.box || group.getBBox();
+
   const localX = box.width * alignX;
   const localY = box.height * alignY;
 
@@ -348,6 +355,7 @@ export const MotionPathPlugin = {
     alignX = vars?.alignOrigin ? vars.alignOrigin[0] || 0 : 0;
     alignY = vars?.alignOrigin ? vars.alignOrigin[1] || 1 : 1;
     autoRotateG = autoRotate ? autoRotate : false;
+    totalLength = pathElTarget.getTotalLength();
     // box = group.getBBox();
 
     if (
@@ -427,13 +435,13 @@ export const MotionPathPlugin = {
     tween.vars.immediateRender && this.render(tween.progress(), this);
   },
   render(ratio, data) {
-    // placeShapeAlongPath(pathElTarget, group, ratio, {
-    //   alignX: alignX,
-    //   alignY: alignY,
-    //   autoRotate: autoRotateG,
-    //   box: box,
-    // });
-    // return;
+    placeShapeAlongPath(pathElTarget, group, ratio, {
+      alignX: alignX,
+      alignY: alignY,
+      autoRotate: autoRotateG,
+      box: box,
+    });
+    return;
 
     let rawPaths = data.rawPaths,
       i = rawPaths.length,

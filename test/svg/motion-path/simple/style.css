@@ -270,9 +270,9 @@ path {
 
 /* DIV: green gradient */
 #div {
-  /* position: absolute; */
+  /* position: absolute;
   top: 30%;
-  left: 60%;
+  left: 60%; */
   width: 120px;
   height: 60px;
   pointer-events: none;

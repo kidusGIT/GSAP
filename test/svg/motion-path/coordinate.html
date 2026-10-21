@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Horizontal Cards with Colored Divs</title>
+    <style>
+      /* General page styling */
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f7f6;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+      }
+
+      /* Container to hold the cards horizontally */
+      .card-container {
+        display: flex;
+        gap: 24px; /* Space between the cards */
+      }
+
+      /* Card styling */
+      .card {
+        background-color: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        width: 220px;
+        height: 180px;
+        padding: 16px;
+        display: flex;
+        transition: transform 0.2s ease;
+      }
+
+      /* Subtle hover effect for the cards */
+      .card:hover {
+        transform: translateY(-5px);
+      }
+
+      /* Inner div common styling */
+      .inner-div {
+        width: 100px;
+        height: 100px;
+        border-radius: 8px;
+      }
+
+      /* Specific colors for the inner divs */
+      .red-div {
+        background-color: #e74c3c; /* Red */
+      }
+
+      .blue-div {
+        background-color: #3498db; /* Blue */
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card-container">
+      <!-- First Card with a Red Div -->
+      <div class="card">
+        <div id="red" class="inner-div red-div"></div>
+      </div>
+
+      <!-- Second Card with a Blue Div -->
+      <div class="card">
+        <div id="blue" class="inner-div blue-div"></div>
+      </div>
+    </div>
+
+    <script>
+      const redDiv = document.getElementById("red");
+      const blueDiv = document.getElementById("blue");
+
+      const redRect = redDiv.getBoundingClientRect();
+      const blueRect = blueDiv.getBoundingClientRect();
+
+      console.log("red bounding ", redRect);
+      console.log("blue bounding ", blueRect);
+
+      //   blueDiv.style.transform = "translate(-276px, 0)";
+
+      const deltaX = redRect.left - blueRect.left;
+      const deltaY = redRect.top - blueRect.top;
+      blueDiv.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
+    </script>
+  </body>
+</html>
