@@ -75,25 +75,10 @@
 
       const redRect = redDiv.getBoundingClientRect();
       const blueRect = blueDiv.getBoundingClientRect();
+      const blueParent = blueDiv.parentElement.getBoundingClientRect();
+      const redParent = redDiv.parentElement.getBoundingClientRect();
 
-      console.log("red bounding ", redRect);
-      console.log("blue bounding ", blueRect);
-
-      //   blueDiv.style.transform = "translate(-276px, 0)";
-      // el point (x, y)
-
-      // dif = abs(target position - element position)
-      // el.x > x
-      // x - el.x
-
-      // else
-      // el.x <= x
-      // el.x + el.x
-
-      // target position is > swap position
-      // swap position - target position
-
-      function alignAtPoint(el, x, y) {
+      function transformAtPoint(el, x, y) {
         const rect = el.getBoundingClientRect();
         const deltaX = Math.abs(x - rect.left);
         const deltaY = Math.abs(y - rect.top);
@@ -101,25 +86,54 @@
         const rectX = rect.x;
         const rectY = rect.y;
 
-        let dx = 0,
-          dy = 0;
+        let dx = rectX > x ? -deltaX : deltaX,
+          dy = rectY > y ? -deltaY : deltaY;
 
-        if (rectX > x) {
-          dx = deltaX - rectX;
-        } else if (rectX < x) {
-          dx = rectX + deltaX;
-        }
-
-        if (rectY > y) {
-          dy = deltaY - rectY;
-        } else if (rectY < y) {
-          dy = rectY + deltaY;
-        }
-        // red x = 242, blue x = 518 (example values) deltaX = -276
         el.style.transform = `translate(${dx}px, ${dy}px)`;
       }
 
-      alignAtPoint(blueDiv, redRect.left, redRect.top);
+      function alignAtPoint(svg, div, svgX, svgY) {
+        // 1. Get the actual rendered size of the SVG on screen
+        const rect = svg.getBoundingClientRect();
+        const viewBox = svg.viewBox.baseVal; // x: -20, y: 0, width: 557, height: 190
+
+        const container = div.parentElement;
+        const bounds = container.getBoundingClientRect();
+
+        // 2. Calculate uniform scale (SVG default is "xMidYMid meet")
+        const scaleX = rect.width / viewBox.width;
+        const scaleY = rect.height / viewBox.height;
+        const scale = Math.min(scaleX, scaleY);
+
+        // 3. Calculate centering offsets (pillarboxing/letterboxing)
+        const scaledWidth = viewBox.width * scale;
+        const scaledHeight = viewBox.height * scale;
+        const offsetX = (rect.width - scaledWidth) / 2;
+        const offsetY = (rect.height - scaledHeight) / 2;
+
+        // 4. Map the SVG coordinate to local pixel coordinates inside the SVG
+        const pixelX = offsetX + (svgX - viewBox.x) * scale;
+        const pixelY = offsetY + (svgY - viewBox.y) * scale;
+
+        // 5. Position the div relative to the container
+        // div.style.position = "absolute";
+        // div.style.left = `${pixelX}px`;
+        // div.style.top = `${pixelY}px`;
+
+        // Center the div anchor point directly on the coordinate
+        // div.style.transform = `translate(${pixelX}px, ${pixelY}px)`;
+      }
+
+      transformAtPoint(
+        blueDiv,
+        redParent.left + redParent.width / 2 - blueRect.width / 2,
+        redParent.top + redParent.height / 2 - blueRect.height / 2,
+      );
+      transformAtPoint(
+        redDiv,
+        blueParent.left + blueParent.width / 2 - redRect.width / 2,
+        blueParent.top + blueParent.height / 2 - redRect.height / 2,
+      );
     </script>
   </body>
 </html>

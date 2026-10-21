@@ -206,13 +206,40 @@ function positionDivAlongPath(path, div, progress = 0.5) {
   div.style.transform = `translate(${x}px, ${y}px) rotate(${angle}deg) `;
 }
 
-function alignAtPoint(svg, div, svgX, svgY) {
+function transformAtPoint(el, x, y) {
+  const rect = el.getBoundingClientRect();
+  const deltaX = Math.abs(x - rect.left);
+  const deltaY = Math.abs(y - rect.top);
+
+  const rectX = rect.x;
+  const rectY = rect.y;
+
+  let dx = rectX > x ? -deltaX : deltaX,
+    dy = rectY > y ? -deltaY : deltaY;
+
+  return { dx, dy };
+}
+
+function alignAtPoint(svg, div, progress) {
   // 1. Get the actual rendered size of the SVG on screen
   const rect = svg.getBoundingClientRect();
   const viewBox = svg.viewBox.baseVal; // x: -20, y: 0, width: 557, height: 190
 
   const container = div.parentElement;
   const bounds = container.getBoundingClientRect();
+
+  const pathLength = path.getTotalLength();
+  const currentLength = pathLength * progress;
+
+  // 2. Get a second point slightly ahead (e.g., 1 pixel) to calculate the tangent angle
+  const nextPoint = path.getPointAtLength(
+    Math.min(pathLength, currentLength + 1),
+  );
+
+  // Calculate the angle in degrees
+  const point = path.getPointAtLength(currentLength);
+  const radians = Math.atan2(nextPoint.y - point.y, nextPoint.x - point.x);
+  const angle = radians * (180 / Math.PI);
 
   // 2. Calculate uniform scale (SVG default is "xMidYMid meet")
   const scaleX = rect.width / viewBox.width;
@@ -226,31 +253,28 @@ function alignAtPoint(svg, div, svgX, svgY) {
   const offsetY = (rect.height - scaledHeight) / 2;
 
   // 4. Map the SVG coordinate to local pixel coordinates inside the SVG
-  const pixelX = offsetX + (svgX - viewBox.x) * scale;
-  const pixelY = offsetY + (svgY - viewBox.y) * scale;
+  const pixelX = offsetX + (point.x - viewBox.x) * scale;
+  const pixelY = offsetY + (point.y - viewBox.y) * scale;
 
-  // 5. Position the div relative to the container
-  // div.style.position = "absolute";
-  // div.style.left = `${pixelX}px`;
-  // div.style.top = `${pixelY}px`;
+  const { dx, dy } = transformAtPoint(div, pixelX, pixelY);
 
-  // Center the div anchor point directly on the coordinate
-  // div.style.transform = `translate(${pixelX}px, ${pixelY}px)`;
+  // div.style.transform = `translate(${dx}px, ${dy}px)`;
+  div.style.transform = `translate(${dx}px, ${dy}px) rotate(${angle}deg)`;
 }
-// alignAtPoint(path.parentElement, document.getElementById("div"), 504.48, 74.5);
+alignAtPoint(path.parentElement, document.getElementById("div"), 0.8);
 
-t = gsap.to("#rect", {
-  duration: 10,
-  // repeat: 3,
-  // yoyo: true,
-  ease: "power1.inOut",
-  motionPath: {
-    path: "#path",
-    align: "#path",
-    autoRotate: true,
-    alignOrigin: [0.5, 0.5],
-  },
-});
+// t = gsap.to("#rect", {
+//   duration: 10,
+//   // repeat: 3,
+//   // yoyo: true,
+//   ease: "power1.inOut",
+//   motionPath: {
+//     path: "#path",
+//     align: "#path",
+//     autoRotate: true,
+//     alignOrigin: [0.5, 0.5],
+//   },
+// });
 
 pause.onclick = () => {
   t.pause();
