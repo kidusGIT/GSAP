@@ -435,13 +435,13 @@ export const MotionPathPlugin = {
     tween.vars.immediateRender && this.render(tween.progress(), this);
   },
   render(ratio, data) {
-    placeShapeAlongPath(pathElTarget, group, ratio, {
-      alignX: alignX,
-      alignY: alignY,
-      autoRotate: autoRotateG,
-      box: box,
-    });
-    return;
+    // placeShapeAlongPath(pathElTarget, group, ratio, {
+    //   alignX: alignX,
+    //   alignY: alignY,
+    //   autoRotate: autoRotateG,
+    //   box: box,
+    // });
+    // return;
 
     let rawPaths = data.rawPaths,
       i = rawPaths.length,

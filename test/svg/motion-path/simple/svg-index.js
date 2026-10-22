@@ -14,13 +14,6 @@ let t;
 const path = document.getElementById("path");
 const group = document.getElementById("rect-2");
 
-/**
- * @param {SVGGeometryElement} path
- * @param {SVGGElement} wrapper
- * @param {number} t - Progress from 0 to 1
- * @param {object} options
- * @returns {boolean} Whether placement succeeded
- */
 function placeShapeAlongPath(path, wrapper, t, options = {}) {
   const {
     alignX = 0.5,
@@ -206,17 +199,10 @@ function positionDivAlongPath(path, div, progress = 0.5) {
   div.style.transform = `translate(${x}px, ${y}px) rotate(${angle}deg) `;
 }
 
-function transformAtPoint(el, x, y) {
+function transformAtPoint(el, targetX, targetY) {
   const rect = el.getBoundingClientRect();
-  const deltaX = Math.abs(x - rect.left);
-  const deltaY = Math.abs(y - rect.top);
-
-  const rectX = rect.x;
-  const rectY = rect.y;
-
-  let dx = rectX > x ? -deltaX : deltaX,
-    dy = rectY > y ? -deltaY : deltaY;
-
+  const dx = targetX - rect.left;
+  const dy = targetY - rect.top;
   return { dx, dy };
 }
 
@@ -224,9 +210,6 @@ function alignAtPoint(svg, div, progress) {
   // 1. Get the actual rendered size of the SVG on screen
   const rect = svg.getBoundingClientRect();
   const viewBox = svg.viewBox.baseVal; // x: -20, y: 0, width: 557, height: 190
-
-  const container = div.parentElement;
-  const bounds = container.getBoundingClientRect();
 
   const pathLength = path.getTotalLength();
   const currentLength = pathLength * progress;
@@ -241,29 +224,31 @@ function alignAtPoint(svg, div, progress) {
   const radians = Math.atan2(nextPoint.y - point.y, nextPoint.x - point.x);
   const angle = radians * (180 / Math.PI);
 
-  // 2. Calculate uniform scale (SVG default is "xMidYMid meet")
   const scaleX = rect.width / viewBox.width;
   const scaleY = rect.height / viewBox.height;
   const scale = Math.min(scaleX, scaleY);
 
-  // 3. Calculate centering offsets (pillarboxing/letterboxing)
   const scaledWidth = viewBox.width * scale;
   const scaledHeight = viewBox.height * scale;
-  const offsetX = (rect.width - scaledWidth) / 2;
-  const offsetY = (rect.height - scaledHeight) / 2;
+  const offsetX = (rect.width - scaledWidth) * 0.5;
+  const offsetY = (rect.height - scaledHeight) * 0.5;
 
-  // 4. Map the SVG coordinate to local pixel coordinates inside the SVG
   const pixelX = offsetX + (point.x - viewBox.x) * scale;
   const pixelY = offsetY + (point.y - viewBox.y) * scale;
 
+  const finalX = pixelX - div.offsetWidth * 1;
+  const finalY = pixelY - div.offsetHeight * 1;
+
   const { dx, dy } = transformAtPoint(div, pixelX, pixelY);
 
-  // div.style.transform = `translate(${dx}px, ${dy}px)`;
-  div.style.transform = `translate(${dx}px, ${dy}px) rotate(${angle}deg)`;
-}
-alignAtPoint(path.parentElement, document.getElementById("div"), 0.8);
+  // div.style.left = `${finalX}px`; // put on the right place
+  // div.style.top = `${finalY}px`; // put on the right place
 
-// t = gsap.to("#rect", {
+  div.style.transform = `translate(${dx}px, ${dy}px)`; // this is not why? fix this or issues on this function transformAtPoint
+}
+alignAtPoint(path.parentElement, document.getElementById("div"), 0.5);
+
+// t = gsap.to("#div", {
 //   duration: 10,
 //   // repeat: 3,
 //   // yoyo: true,
@@ -271,8 +256,8 @@ alignAtPoint(path.parentElement, document.getElementById("div"), 0.8);
 //   motionPath: {
 //     path: "#path",
 //     align: "#path",
-//     autoRotate: true,
-//     alignOrigin: [0.5, 0.5],
+//     // autoRotate: true,
+//     // alignOrigin: [0.5, 0.5],
 //   },
 // });
 
