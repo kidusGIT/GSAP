@@ -246,20 +246,20 @@ function alignAtPoint(svg, div, progress) {
 
   div.style.transform = `translate(${dx}px, ${dy}px)`; // this is not why? fix this or issues on this function transformAtPoint
 }
-alignAtPoint(path.parentElement, document.getElementById("div"), 0.5);
+// alignAtPoint(path.parentElement, document.getElementById("div"), 0.5);
 
-// t = gsap.to("#div", {
-//   duration: 10,
-//   // repeat: 3,
-//   // yoyo: true,
-//   ease: "power1.inOut",
-//   motionPath: {
-//     path: "#path",
-//     align: "#path",
-//     // autoRotate: true,
-//     // alignOrigin: [0.5, 0.5],
-//   },
-// });
+t = gsap.to("#rect", {
+  duration: 5,
+  // repeat: 3,
+  // yoyo: true,
+  ease: "power1.inOut",
+  motionPath: {
+    path: "#path",
+    align: "#path",
+    autoRotate: true,
+    alignOrigin: [1, 1],
+  },
+});
 
 pause.onclick = () => {
   t.pause();
