@@ -1,0 +1,185 @@
+import { gsap } from "../../../src/index.js";
+
+const start = document.getElementById("btn-start");
+const pause = document.getElementById("btn-pause");
+const reverse = document.getElementById("btn-reverse");
+const play = document.getElementById("btn-play");
+const resume = document.getElementById("btn-resume");
+const seek = document.getElementById("btn-seek");
+
+let t;
+
+t = gsap.to(".square", {
+  duration: 1,
+  scale: 0.1,
+  yoyo: true,
+  repeat: 1,
+  ease: "power1.inOut",
+  stagger: {
+    grid: [1, 5],
+    // from: "center",
+    amount: 5,
+  },
+});
+
+// t = gsap.to(".green", {
+//   // keyframes: {
+//   //   x: [0, 535, 535, 0, 0],
+//   //   y: [0, 0, 100, 100, 0],
+//   //   // ease: "power1.inOut",
+//   // },
+//   // rotate: 180,
+//   // width: 300,
+//   // ease: "bounce.in",
+//   // ease: "sine.in",
+//   ease: "elastic.out(1,0.3)",
+//   // ease: "steps(6)",
+//   // ease: "power2.out",
+//   y: 355,
+//   duration: 1.5,
+// });
+
+// const t = gsap.timeline();
+// t.to(".green", { duration: 1, x: 535 })
+//   .to(".yellow", { duration: 2, x: 535 }, ">-2")
+//   .to(".red", { duration: 1, x: 535 }, "<-1");
+
+// t = gsap.timeline({ repeat: 2, yoyo: true });
+// t.to(".green", { duration: 1, x: 535 })
+//   .to(".yellow", { duration: 1.3, x: 535 })
+//   .to(".red", { duration: 1, x: 535 });
+
+// t = gsap.to(".green", {
+//   duration: 4,
+//   repeat: 2,
+//   yoyo: true,
+//   keyframes: {
+//     x: [0, 535, 535, 0, 0],
+//     y: [0, 0, 100, 100, 0],
+
+//     //   // "0%": {
+//     //   //   x: 0,
+//     //   //   y: 0,
+//     //   //   backgroundColor: "green",
+//     //   //   // scale: 1,
+//     //   //   // rotation: 0,
+//     //   //   ease: "none",
+//     //   // },
+//     //   // "25%": {
+//     //   //   x: 535,
+//     //   //   y: 0,
+//     //   //   backgroundColor: "#1971c2",
+//     //   //   // scale: 0.4,
+//     //   //   // rotation: 20,
+//     //   //   duration: 2,
+//     //   //   ease: "power1.out",
+//     //   // },
+//     //   // "50%": {
+//     //   //   x: 535,
+//     //   //   y: 100,
+//     //   //   backgroundColor: "#e67700",
+//     //   //   // scale: 1,
+//     //   //   // rotation: 0,
+//     //   //   ease: "power1.inOut",
+//     //   // },
+//     //   // "75%": {
+//     //   //   x: 0,
+//     //   //   y: 100,
+//     //   //   backgroundColor: "#c2255c",
+//     //   //   // scale: 0.9,
+//     //   //   // rotation: -20,
+//     //   //   ease: "power1.in",
+//     //   // },
+//     //   // "100%": {
+//     //   //   x: 0,
+//     //   //   y: 0,
+//     //   //   backgroundColor: "green",
+//     //   //   // scale: 1,
+//     //   //   // rotation: 0,
+//     //   //   ease: "none",
+//     //   // },
+//   },
+//   // keyframes: [
+//   //   { x: 0, y: 0, ease: "none" },
+//   //   { x: 535, y: 0, duration: 2, ease: "power1.out" },
+//   //   { x: 535, y: 100, ease: "power1.inOut" },
+//   //   { x: 0, y: 100, ease: "power1.in" },
+//   //   { x: 0, y: 0, ease: "none" },
+//   // ],
+// });
+
+// t = gsap.timeline();
+// t.to(".green", { duration: 1, x: 535 })
+//   .from(".yellow", { duration: 1, x: 535 })
+//   .to(".red", { duration: 1, x: 535 });
+
+// let t = gsap.timeline();
+
+// t.to(".green", {
+//   x: 535,
+//   rotation: 360,
+//   scale: 0.5,
+// })
+//   .to(".green", {
+//     y: 100,
+//     rotation: 180,
+//   })
+//   .to(".green", {
+//     x: 10,
+//   })
+//   .to(".green", {
+//     y: 0,
+//     scale: 1,
+//   });
+
+// t = gsap.to(".green", {
+//   duration: 1,
+//   x: 535,
+//   // delay: 1,
+//   rotation: 180,
+//   // scale: 0.5,
+//   repeat: Infinity,
+//   yoyo: true,
+// });
+
+// t = gsap.from(".ball", {
+//   duration: 1,
+//   rotation: 180,
+//   x: 535,
+//   scaleX: 0.5,
+//   scaleY: 0.5,
+//   // opacity: 1,
+//   // repeat: 2,
+//   // yoyo: true,
+//   stagger: {
+//     each: 0.5,
+//     // from: "center",
+//     // yoyo: true,
+//   },
+//   ease: "sine.out",
+// });
+
+pause.onclick = () => {
+  t.pause();
+};
+
+reverse.onclick = () => {
+  console.log("-----------------------------------");
+  t.reverse();
+};
+
+play.onclick = () => {
+  t.play();
+};
+
+resume.onclick = () => {
+  t.resume();
+};
+
+seek.onclick = () => {
+  t.seek(1.5);
+};
+
+// start.onclick = () => {
+//   // t.animate(".yellow", "left", { duration: 1000, to: 420 });
+// };
