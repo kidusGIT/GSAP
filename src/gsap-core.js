@@ -3383,6 +3383,105 @@ _forEachName(
  */
 
 export class Tween extends Animation {
+  getAdvancedGridStagger(index, options = {}) {
+    const {
+      width = 5,
+      height = 5,
+      from = "end", // Can be: 'start', 'end', 'center', 'edges', a numeric index (e.g., 12), or [row, col]
+      axis = undefined, // Can be: 'x', 'y', or undefined (both axes)
+      stepDelay = 0.5, // Time gap per distance unit
+      elementDuration = 1.0, // Fixed duration each element animates
+    } = options;
+
+    // 1. Target element coordinates
+    const r = Math.floor(index / width);
+    const c = index % width;
+
+    // 2. Parse the 'from' parameter into origin coordinates (r0, c0) or edge mode
+    let r0 = 0;
+    let c0 = 0;
+    const f = from.toLowerCase();
+    let isEdges = false;
+
+    if (typeof from === "number") {
+      // Literal grid index origin
+      r0 = Math.floor(from / width);
+      c0 = from % width;
+    } else if (Array.isArray(from)) {
+      // Array coordinate [row, col]
+      r0 = from[0];
+      c0 = from[1];
+    } else if (typeof from === "string") {
+      switch (f) {
+        case "start":
+          r0 = 0;
+          c0 = 0;
+          break;
+        case "end":
+          r0 = height - 1;
+          c0 = width - 1;
+          break;
+        case "center":
+          r0 = (height - 1) / 2;
+          c0 = (width - 1) / 2;
+          break;
+        case "edges":
+          isEdges = true;
+          r0 = (height - 1) / 2;
+          c0 = (width - 1) / 2;
+          break;
+        default:
+          r0 = 0;
+          c0 = 0;
+      }
+    }
+
+    // 3. Calculate distance based on axis rules
+    let distance = 0;
+
+    // if (isEdges) {
+    //   // Edges ripple inward from outer borders
+    //   const distToEdge = Math.min(r, c, height - 1 - r, width - 1 - c);
+    //   if (axis === "x") {
+    //     distance = Math.min(c, width - 1 - c);
+    //   } else if (axis === "y") {
+    //     distance = Math.min(r, height - 1 - r);
+    //   } else {
+    //     distance = distToEdge;
+    //   }
+    // }
+
+    {
+      const rowDist = Math.abs(r - r0);
+      const colDist = Math.abs(c - c0);
+
+      if (axis === "x") {
+        // Restrict stagger wave strictly along the X axis
+        distance = colDist;
+      } else if (axis === "y") {
+        // Restrict stagger wave strictly along the Y axis
+        distance = rowDist;
+      } else {
+        // Full 2D Manhattan distance (default)
+        const diff = isEdges ? -1 : 1;
+        distance = (rowDist + colDist) * diff;
+      }
+    }
+
+    // 4. Calculate start and end times (fixed 1-second duration per element)
+    const startTime = (isEdges ? distance : distance) * stepDelay;
+    const endTime = startTime + elementDuration;
+
+    return {
+      index,
+      row: r,
+      col: c,
+      distance,
+      startTime: Number(startTime.toFixed(2)),
+      endTime: Number(endTime.toFixed(2)),
+    };
+  }
+
   constructor(targets, vars, position, skipInherit) {
     if (typeof vars === "number") {
       position.duration = vars;
@@ -3482,10 +3581,18 @@ export class Tween extends Animation {
             this._start += delay;
             copy.delay = 0;
           }
+
+          const t = this.getAdvancedGridStagger(i, stagger);
+          // const t = null;
+
           tl.to(
             curTarget,
             copy,
-            staggerFunc ? staggerFunc(i, curTarget, parsedTargets) : 0,
+            t
+              ? t.startTime
+              : staggerFunc
+                ? staggerFunc(i, curTarget, parsedTargets)
+                : 0,
           );
           tl._ease = _easeMap.none;
         }

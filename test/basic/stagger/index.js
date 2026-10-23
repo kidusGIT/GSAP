@@ -16,9 +16,11 @@ t = gsap.to(".square", {
   repeat: 1,
   ease: "power1.inOut",
   stagger: {
-    grid: [1, 5],
-    // from: "center",
-    amount: 5,
+    // grid: [1, 3],
+    grid: "auto",
+    from: "edges",
+    // axis: "x",
+    amount: 1,
   },
 });
 
